@@ -10,7 +10,7 @@ namespace Spard.Sources
     internal class BufferedSource: ISource
     {
         private IEnumerator _source = null;
-        private List<object> _buffer = new List<object>();
+        private readonly List<object> _buffer = new List<object>();
         private int _index = 0;
 
         protected BufferedSource()

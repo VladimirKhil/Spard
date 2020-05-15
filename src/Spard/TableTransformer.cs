@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using Spard.Compilation.CSharp;
-using System.Collections;
-using System.Threading;
-using Spard.Transitions;
-using Spard.Core;
-using System.Linq;
-using Spard.Sources;
-using Spard.Common;
-using System.Text;
-using System.IO;
-using Spard.Compilation;
+﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Spard.Compilation;
+using Spard.Compilation.CSharp;
+using Spard.Core;
+using Spard.Transitions;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading;
 
 namespace Spard
 {
@@ -31,7 +29,7 @@ namespace Spard
         /// <summary>
         /// Transformer initial state
         /// </summary>
-        private TransitionStateBase _initialState;
+        private readonly TransitionStateBase _initialState;
 
         /// <summary>
         /// Has error happened
@@ -47,17 +45,17 @@ namespace Spard
             _initialState = state;
         }
 
-        public override IEnumerable<object> Transform(IEnumerable input, CancellationToken cancellationToken = default(CancellationToken))
+        public override IEnumerable<object> Transform(IEnumerable input, CancellationToken cancellationToken = default)
         {
             var state = _initialState;
             var context = new TransitionContext();
 
             var sourceEnumerator = input.GetEnumerator();
-            var isNotFinal = false;
             IEnumerable result;
 
             var beforeStart = true;
 
+            bool isNotFinal;
             do
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -123,7 +121,7 @@ namespace Spard
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default(CancellationToken))
+        public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -168,21 +166,7 @@ namespace Spard
             CSCodeBuilder.CreateTransformerCode(_initialState, wr);
         }
 
-        private Assembly GenerateCode()
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// Compile this transformer into .NET executable code
-        /// </summary>
-        /// <returns></returns>
-        private Func<IEnumerable, IEnumerable> GenerateFunction()
-        {
-            return null;
-        }
-
-        public void Save(System.IO.Stream stream)
+        public void Save(Stream stream)
         {
             _initialState.Save(stream);
         }
@@ -198,7 +182,7 @@ namespace Spard
 
             if (args.Length == 0)
             {
-                result = TransformEmpty(cancellationToken);
+                result = TransformEmpty();
             }
             else if (args.Length == 1)
             {
@@ -208,7 +192,7 @@ namespace Spard
                     if (casted.Cast<object>().Any())
                         result = Transform(casted, cancellationToken);
                     else
-                        result = TransformEmpty(cancellationToken);
+                        result = TransformEmpty();
                 }
                 else
                     result = Transform(new object[] { args[0] }, cancellationToken);
@@ -230,7 +214,7 @@ namespace Spard
             return result;
         }
 
-        private IEnumerable TransformEmpty(CancellationToken cancellationToken)
+        private IEnumerable TransformEmpty()
         {
             throw new NotImplementedException();
         }

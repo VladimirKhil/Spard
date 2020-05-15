@@ -3,9 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Spard
 {
@@ -17,7 +15,7 @@ namespace Spard
 
             if (args.Length == 0)
             {
-                result = TransformEmpty(cancellationToken);
+                result = TransformEmpty();
             }
             else if (args.Length == 1)
             {
@@ -27,7 +25,7 @@ namespace Spard
                     if (casted.Cast<object>().Any())
                         result = Transform(casted, cancellationToken);
                     else
-                        result = TransformEmpty(cancellationToken);
+                        result = TransformEmpty();
                 }
                 else
                     result = Transform(new object[] { args[0] }, cancellationToken);
@@ -49,12 +47,12 @@ namespace Spard
             return result;
         }
 
-        private IEnumerable TransformEmpty(CancellationToken cancellationToken)
+        private IEnumerable TransformEmpty()
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default(CancellationToken))
+        public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

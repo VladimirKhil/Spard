@@ -23,19 +23,19 @@ namespace Spard
         #region Fields
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private TransformMode mode = TransformMode.Modification;
+        private TransformMode _mode = TransformMode.Modification;
 
         /// <summary>
         /// Main function definitions
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Function[] functions = null;
+        private Function[] _functions = null;
 
         /// <summary>
         /// Subfunctions definitions
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<Tuple<string, string>, Function[]> functionDefinitions = new Dictionary<Tuple<string, string>, Function[]>();
+        private Dictionary<Tuple<string, string>, Function[]> _functionDefinitions = new Dictionary<Tuple<string, string>, Function[]>();
 
         /// <summary>
         /// Sets definitions
@@ -46,17 +46,12 @@ namespace Spard
         /// <summary>
         /// Transformer direction
         /// </summary>
-        protected internal Directions direction = Directions.Right;
-
-        /// <summary>
-        /// Index of function rule that had returned the most recent successful result. It is used to receive next result after the most recent
-        /// </summary>
-        private int functionIndex = 0;
+        protected internal Directions _direction = Directions.Right;
 
         /// <summary>
         /// Function name that current transformer belongs to (if appliable)
         /// </summary>
-        private string name = null;
+        private string _name = null;
 
         #endregion
 
@@ -65,17 +60,12 @@ namespace Spard
         /// <summary>
         /// Transformation mode which affects transformer behavior when an error occurred
         /// </summary>
-        public TransformMode Mode { get { return mode; } set { mode = value; } }
-
-        /// <summary>
-        /// Main function definitions
-        /// </summary>
-        public Function[] Functions { get { return functions; } set { functions = value; } }
+        public TransformMode Mode { get { return _mode; } set { _mode = value; } }
 
         /// <summary>
         /// Subfunctions definitions
         /// </summary>
-        public Dictionary<Tuple<string, string>, Function[]> FunctionDefinitions { get { return functionDefinitions; } set { functionDefinitions = value; } }
+        public Dictionary<Tuple<string, string>, Function[]> FunctionDefinitions { get { return _functionDefinitions; } set { _functionDefinitions = value; } }
 
         /// <summary>
         /// Sets definitions
@@ -107,7 +97,7 @@ namespace Spard
 
         #region Constructor
 
-        private IExpressionRoot root;
+        private readonly IExpressionRoot root;
         public bool SearchBestVariant { get; set; }
 
         /// <summary>
@@ -195,7 +185,7 @@ namespace Spard
                         if (definition.Left is Set)
                             setDefinitions.Add(definition);
                         else if (definition.Left is StringValueMatch && (definition.Right is Function || definition.Right is ComplexValueMatch))
-                            functionDefinitions.Add(Process(definition));
+                            functionDefinitions.Add(definition);
                         else
                         {
                             var coords = builder.GetCoordinates(expr);
@@ -211,16 +201,16 @@ namespace Spard
                     }
                 }
 
-                this.functions = functions.ToArray();
+                this._functions = functions.ToArray();
 
-                if (!this.functions.Any())
+                if (!this._functions.Any())
                     throw new ParseException("No transformation rules are set");
 
                 var resultOfFunctionDefinitions = CreateFunctionDefinitions(functionDefinitions);
 
                 foreach (var func in resultOfFunctionDefinitions)
                 {
-                    this.functionDefinitions.Add(Tuple.Create("", func.Key), func.Value.ToArray());
+                    this._functionDefinitions.Add(Tuple.Create("", func.Key), func.Value.ToArray());
                 }
 
                 var resultOfSetDefinitions = CreateSetDefinitions(setDefinitions);
@@ -240,7 +230,7 @@ namespace Spard
                     if (Array.IndexOf(BuiltInFunctions, name) > -1)
                         continue;
 
-                    if (!this.functionDefinitions.ContainsKey(item.Value))
+                    if (!this._functionDefinitions.ContainsKey(item.Value))
                     {
                         var coords = builder.GetCoordinates(item.Key);
                         throw new ParseException(coords.Item1, coords.Item2, string.Format("Function '{0}' definition not found", item.Key));
@@ -380,7 +370,7 @@ namespace Spard
             parent.SetOperands(operands);
         }
 
-        private Expression InlineSetDefiniton(Set calledSet, Definition definition)
+        private static Expression InlineSetDefiniton(Set calledSet, Definition definition)
         {
             // Variables unification
             // TODO: Rename duplicate variables
@@ -389,10 +379,10 @@ namespace Spard
             var calledArgs = (TupleValueMatch)calledSet.Operand;
             var definedArgs = (TupleValueMatch)((Set)definition.Left).Operand;
 
-            for (int i = 1; i < calledArgs.operands.Length; i++)
+            for (int i = 1; i < calledArgs._operands.Length; i++)
             {
-                var first = calledArgs.operands[i];
-                var second = definedArgs.operands[i];
+                var first = calledArgs._operands[i];
+                var second = definedArgs._operands[i];
 
                 if (first is Query firstQuery && second is Query secondQuery && firstQuery.Name == secondQuery.Name)
                     continue; // It is the same variable, no unification is required
@@ -403,7 +393,7 @@ namespace Spard
             }
 
             if (definition.Right is Sequence seq)
-                expressions.AddRange(seq.operands);
+                expressions.AddRange(seq._operands);
             else if (!(definition.Right is Empty))
                 expressions.Add(definition.Right);
 
@@ -427,7 +417,7 @@ namespace Spard
         /// <returns>Table converter equivalent to the original function</returns>
         private TableTransformer BuildOptimizedFunction(string functionName, Directions direction)
         {
-            if (!functionDefinitions.TryGetValue(Tuple.Create("", functionName), out Function[] functions))
+            if (!_functionDefinitions.TryGetValue(Tuple.Create("", functionName), out Function[] functions))
                 return null;
 
             var collection = TransitionTableResultCollection.Create(functions);
@@ -437,7 +427,7 @@ namespace Spard
         }
 
         private Dictionary<Tuple<string, Directions>, ITransformFunction> optimizedFunctions = new Dictionary<Tuple<string, Directions>, ITransformFunction>();
-        private Dictionary<Tuple<string, Directions>, ITransformFunction> compiledFunctions = new Dictionary<Tuple<string, Directions>, ITransformFunction>();
+        private readonly Dictionary<Tuple<string, Directions>, ITransformFunction> compiledFunctions = new Dictionary<Tuple<string, Directions>, ITransformFunction>();
 
         private void ProcessGlobalInstruction(Instruction instr)
         {
@@ -455,16 +445,16 @@ namespace Spard
                     SuppressInline = true;
             }
 
-            if (!(instr.Operand is TupleValueMatch list) || list.operands.Length != 2 && list.operands.Length != 3)
+            if (!(instr.Operand is TupleValueMatch list) || list._operands.Length != 2 && list._operands.Length != 3)
                 return;
 
-            var name = list.operands[0].ToString();
+            var name = list._operands[0].ToString();
 
             if (name == "optimize" || name == "compile")
             {
                 // Optimizing function
-                var functionName = list.operands[1].ToString();
-                var isLeft = list.operands.Length > 2 && list.operands[2].ToString() == "left";
+                var functionName = list._operands[1].ToString();
+                var isLeft = list._operands.Length > 2 && list._operands[2].ToString() == "left";
 
                 if (name == "optimize")
                     optimizedFunctions[Tuple.Create(functionName, isLeft ? Directions.Left : Directions.Right)] = null;
@@ -479,9 +469,8 @@ namespace Spard
                 if (LoadModule == null)
                     return;
 
-                var moduleIntValue = list.operands[2] as StringValueMatch;
 
-                if (!(list.operands[1] is StringValueMatch moduleExtValue) || moduleIntValue == null)
+                if (!(list._operands[1] is StringValueMatch moduleExtValue) || !(list._operands[2] is StringValueMatch moduleIntValue))
                     return;
 
                 var moduleExtKey = moduleExtValue.Value;
@@ -495,9 +484,9 @@ namespace Spard
                     innerInstructions = module.ParseModule(reader);
                 }
 
-                foreach (var item in module.functionDefinitions)
+                foreach (var item in module._functionDefinitions)
                 {
-                    functionDefinitions.Add(Tuple.Create(moduleIntKey, item.Key.Item2), item.Value.ToArray());
+                    _functionDefinitions.Add(Tuple.Create(moduleIntKey, item.Key.Item2), item.Value.ToArray());
                 }
 
                 foreach (var item in module.setDefinitions)
@@ -519,7 +508,7 @@ namespace Spard
             {
                 var set = (Set)definition.Left;
                 var setName = set.Name;
-                var numOfParams = set.List.operands.Length;
+                var numOfParams = set.List._operands.Length;
                 var key = Tuple.Create(setName, numOfParams);
 
                 if (!resultOfSetDefinitions.TryGetValue(key, out List<Definition> defs))
@@ -561,7 +550,7 @@ namespace Spard
 				{
 					if (complexValue.Operand is Block block)
 					{
-						foreach (var subFunction in block.operands.OfType<Function>())
+						foreach (var subFunction in block._operands.OfType<Function>())
 						{
 							branches.Add(subFunction);
 						}
@@ -569,7 +558,7 @@ namespace Spard
 
 					if (complexValue.Operand is TupleValueMatch tupleValue)
 					{
-						foreach (var subFunction in tupleValue.operands.OfType<Function>())
+						foreach (var subFunction in tupleValue._operands.OfType<Function>())
 						{
 							branches.Add(subFunction);
 						}
@@ -599,7 +588,7 @@ namespace Spard
 						if (def.Left is Set)
 							setDefinitions.Add(def);
 						else if (def.Left is StringValueMatch && (def.Right is Function || def.Right is Block))
-							functionDefinitions.Add(Process(def));
+							functionDefinitions.Add(def);
 
 						continue;
 					}
@@ -611,13 +600,13 @@ namespace Spard
 				}
             }
 
-            functions = new Function[0];
+            _functions = Array.Empty<Function>();
 
             var resultOfFunctionDefinitions = CreateFunctionDefinitions(functionDefinitions);
 
             foreach (var func in resultOfFunctionDefinitions)
             {
-                this.functionDefinitions.Add(Tuple.Create("", func.Key), func.Value.ToArray());
+                this._functionDefinitions.Add(Tuple.Create("", func.Key), func.Value.ToArray());
             }
 
             var resultOfSetDefinitions = CreateSetDefinitions(setDefinitions);
@@ -630,39 +619,6 @@ namespace Spard
             return instructions.ToArray();
         }
 
-        private Definition Process(Definition def)
-        {
-			if (def.Right is ComplexValueMatch complexValue)
-			{
-				if (complexValue.Operand is Block block)
-				{
-					foreach (var func in block.Operands().OfType<Function>())
-					{
-						ProcessFunction(func);
-					}
-				}
-
-				if (complexValue.Operand is TupleValueMatch tuple)
-				{
-					foreach (var func in tuple.Operands().OfType<Function>())
-					{
-						ProcessFunction(func);
-					}
-				}
-			}
-			else
-			{
-				ProcessFunction((Function)def.Right);
-			}
-
-			return def;
-        }
-
-        private void ProcessFunction(Function func)
-        {
-            
-        }
-
         #endregion
 
         #region Construct new transformer
@@ -672,18 +628,18 @@ namespace Spard
         /// </summary>
         /// <returns>Created transformer</returns>
         /// <remarks>The resulting transformer is faster than the source forest of expressions and is designed to handle a large data set</remarks>
-        public TableTransformer BuildTableTransformer(CancellationToken? cancellationToken = null)
+        public TableTransformer BuildTableTransformer(CancellationToken cancellationToken = default)
         {
             // Let's add to the list of expressions an additional expression depending on the selected conversion mode
             IEnumerable<Expression> expressions;
-            switch (mode)
+            switch (_mode)
             {
                 case TransformMode.Reading:
-                    expressions = functions.Concat(new Expression[] { new Function(Any.Instance, Empty.Instance) }); // . =>
+                    expressions = _functions.Concat(new Expression[] { new Function(Any.Instance, Empty.Instance) }); // . =>
                     break;
 
                 case TransformMode.Modification:
-                    expressions = functions.Concat(new Expression[] {
+                    expressions = _functions.Concat(new Expression[] {
                         new Function(new Query(new StringValueMatch("x")),
                         new Query(new StringValueMatch("x")))
                     }); // $x => $x
@@ -691,7 +647,7 @@ namespace Spard
 
                 case TransformMode.Function:
                 default: // Leave as is
-                    expressions = functions;
+                    expressions = _functions;
                     break;
             }
 
@@ -711,11 +667,11 @@ namespace Spard
 
             var transformer = new TreeTransformer(root) 
             {
-                Functions = Functions,
+                _functions = _functions,
                 FunctionDefinitions = FunctionDefinitions,
-                mode = mode,
+                _mode = _mode,
                 SetDefinitions = SetDefinitions,
-                direction = direction == Directions.Left ? Directions.Right : Directions.Left,
+                _direction = _direction == Directions.Left ? Directions.Right : Directions.Left,
                 typesTable = typesTable,
                 optimizedFunctions = optimizedFunctions
             };
@@ -727,7 +683,7 @@ namespace Spard
 
         #endregion
 
-        public override IEnumerable<object> Transform(IEnumerable input, CancellationToken cancellationToken = default(CancellationToken))
+        public override IEnumerable<object> Transform(IEnumerable input, CancellationToken cancellationToken = default)
         {
             var source = ValueConverter.ConvertToSource(input);
 
@@ -739,7 +695,7 @@ namespace Spard
 			return TransformInternal(source, runtime);
         }
 
-        public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default(CancellationToken))
+        public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default)
         {
             var source = ValueConverter.ConvertToSource(input);
 
@@ -768,12 +724,11 @@ namespace Spard
             while (!source.EndOfSource)
             {
                 result = null;
-                for (var i = 0; i < functions.Length; i++)
+                for (var i = 0; i < _functions.Length; i++)
                 {
-                    result = functions[i].Transform(source, direction, false, runtime);
+                    result = _functions[i].Transform(source, _direction, false, runtime);
                     if (result != null)
                     {
-                        functionIndex = i;
                         yield return result;
 
                         break;
@@ -789,7 +744,7 @@ namespace Spard
                 if (runtime.CancellationToken.IsCancellationRequested)
                     throw new SpardException("Transformation was cancelled!");
 
-                switch (mode)
+                switch (_mode)
                 {
                     case TransformMode.Reading:
                         source.Read(); // Implemented as . =>
@@ -800,7 +755,7 @@ namespace Spard
                         break;
 
                     case TransformMode.Function:
-                        throw new TransformException("Transformation error in function " + (name ?? "_MAIN_!"))
+                        throw new TransformException("Transformation error in function " + (_name ?? "_MAIN_!"))
                         {
                              TransformSource = source,
                              Runtime = runtime
@@ -819,14 +774,11 @@ namespace Spard
 				SearchBestVariant = SearchBestVariant
 			};
 
-			IEnumerable<object> result = null;
-
-            for (var i = 0; i < functions.Length; i++)
+            for (var i = 0; i < _functions.Length; i++)
             {
-                result = functions[i].Transform(source, direction, false, runtime, true);
+                IEnumerable<object> result = _functions[i].Transform(source, _direction, false, runtime, true);
                 if (result != null)
                 {
-                    functionIndex = i;
                     foreach (var item in result)
                     {
                         yield return item;
@@ -888,12 +840,12 @@ namespace Spard
                 return transformFunction;
             }
 
-            if (!functionDefinitions.TryGetValue(Tuple.Create(module, functionName), out Function[] result))
+            if (!_functionDefinitions.TryGetValue(Tuple.Create(module, functionName), out Function[] result))
             {
                 // Look for the function definition in other modules
                 if (module.Length == 0)
                 {
-                    result = functionDefinitions.FirstOrDefault(k => k.Key.Item1.Length > 0 && k.Key.Item2 == functionName).Value;
+                    result = _functionDefinitions.FirstOrDefault(k => k.Key.Item1.Length > 0 && k.Key.Item2 == functionName).Value;
 
                     if (result == null)
                     {
@@ -907,7 +859,7 @@ namespace Spard
                     return null;
             }
 
-            var transformer = new TreeTransformer(this) { functions = result.Select(f => (Function)f.CloneExpression()).ToArray(), mode = TransformMode.Function, name = functionName };
+            var transformer = new TreeTransformer(this) { _functions = result.Select(f => (Function)f.CloneExpression()).ToArray(), _mode = TransformMode.Function, _name = functionName };
 
             if (direction == Directions.Left)
                 transformer = transformer.Reverse();
@@ -945,12 +897,12 @@ namespace Spard
         /// </summary>
         private void CallEverywhere(Action<Expression> action)
         {
-            foreach (var expr in functions)
+            foreach (var expr in _functions)
             {
                 CallEverywhereInTree(expr, action);
             }
 
-            foreach (var func in functionDefinitions.Values)
+            foreach (var func in _functionDefinitions.Values)
             {
                 foreach (var expr in func)
                 {
@@ -967,7 +919,7 @@ namespace Spard
             }
         }
 
-        private void CallEverywhereInTree(Expression expr, Action<Expression> action)
+        private static void CallEverywhereInTree(Expression expr, Action<Expression> action)
         {
             Debug.Assert(expr != null);
             foreach (var descedant in GetNodes(expr))
@@ -1000,7 +952,7 @@ namespace Spard
         public void AddSetDefinition(Definition def)
         {
             var set = (Set)def.Left;
-            var key = Tuple.Create("", set.Name, set.List.operands.Length);
+            var key = Tuple.Create("", set.Name, set.List._operands.Length);
             var has = setDefinitions.ContainsKey(key);
 
             if (setDefinitions.TryGetValue(key, out Definition[] existing))
@@ -1037,7 +989,7 @@ namespace Spard
         public void ReplaceSetDefinition(Definition def)
         {
             var set = (Set)def.Left;
-            var key = Tuple.Create("", set.Name, set.List.operands.Length);
+            var key = Tuple.Create("", set.Name, set.List._operands.Length);
             var has = setDefinitions.ContainsKey(key);
 
             setDefinitions[key] = new Definition[] { def };

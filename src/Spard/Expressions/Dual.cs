@@ -12,12 +12,12 @@ namespace Spard.Expressions
         /// </summary>
         protected internal abstract string CloseSign { get; }
 
-        public Dual()
+        protected Dual()
         {
 
         }
 
-        public Dual(Expression operand)
+        protected Dual(Expression operand)
             : base(operand)
         {
 

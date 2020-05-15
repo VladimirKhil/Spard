@@ -39,7 +39,7 @@ namespace Spard.Expressions
 
         internal override bool MatchCore(ISource input, ref IContext context, bool next)
         {
-            IContext workingContext = null;
+            IContext workingContext;
             if (!next)
             {
                 _initContext = context; // If the match is successful, we will still rewrite the context. Otherwise the value of initContext doesn’t bother us much
@@ -49,7 +49,7 @@ namespace Spard.Expressions
             else
             {
                 workingContext = _initContext;
-                _index = operands.Length - 1;
+                _index = _operands.Length - 1;
             }
 
             var initStart = input.Position;
@@ -65,14 +65,14 @@ namespace Spard.Expressions
                 workingContext.Vars["preferredLength"] = preferredLength;
             }
 
-            while (_index > -1 && _index < operands.Length)
+            while (_index > -1 && _index < _operands.Length)
             {
                 input.Position = initStart;
 
                 if (_index > 0)
                     preferredLength.Push(_end - initStart);
 
-                if (operands[_index].Match(input, ref workingContext, next))
+                if (_operands[_index].Match(input, ref workingContext, next))
                 {
                     if (_index > 0)
                         preferredLength.Pop();
@@ -116,8 +116,8 @@ namespace Spard.Expressions
 
         internal override TransitionTable BuildTransitionTableCore(TransitionSettings settings, bool isLast)
         {
-            var tables = operands.Select(expr => expr.BuildTransitionTable(settings, isLast));
-            return TransitionTable.Intersect(tables.ToArray(), isLast);
+            var tables = _operands.Select(expr => expr.BuildTransitionTable(settings, isLast));
+            return TransitionTable.Intersect(tables.ToArray());
         }
 
         public override Expression CloneCore()

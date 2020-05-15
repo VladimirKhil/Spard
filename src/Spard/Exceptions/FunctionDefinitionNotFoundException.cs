@@ -10,12 +10,18 @@
         /// </summary>
         public string FunctionName { get; internal set; }
 
-        public override string Message
+        public override string Message => $"Function \"{FunctionName}\" definitions was not found";
+
+        public FunctionDefinitionNotFoundException(string message) : base(message)
         {
-            get
-            {
-                return string.Format("Function \"{0}\" definitions was not found", FunctionName);
-            }
+        }
+
+        public FunctionDefinitionNotFoundException(string message, System.Exception innerException) : base(message, innerException)
+        {
+        }
+
+        public FunctionDefinitionNotFoundException()
+        {
         }
     }
 }

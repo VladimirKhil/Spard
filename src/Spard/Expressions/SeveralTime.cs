@@ -10,7 +10,7 @@ namespace Spard.Expressions
     /// </summary>
     public sealed class SeveralTime : Unary
     {
-        private MultiMatchManager _manager = new MultiMatchManager();
+        private readonly MultiMatchManager _manager = new MultiMatchManager();
 
         protected internal override Relationship OperandPosition
         {

@@ -6,7 +6,7 @@ namespace Spard.Transitions
 {
     internal sealed class TransitionSettings
     {
-        private Dictionary<Expression, TransitionTable> transitionsCache = new Dictionary<Expression, TransitionTable>();
+        private readonly Dictionary<Expression, TransitionTable> transitionsCache = new Dictionary<Expression, TransitionTable>();
 
         internal Dictionary<Expression, TransitionTable> TransitionsCache { get { return transitionsCache; } }
 

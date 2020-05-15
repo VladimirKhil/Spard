@@ -40,7 +40,7 @@ namespace Spard.Expressions
 
         internal override bool MatchCore(ISource input, ref IContext context, bool next)
         {
-            IContext workingContext = null;
+            IContext workingContext;
             if (!next)
             {
                 initContext = context; // If the match is successful, we will still rewrite the context. Otherwise the value of initContext doesn’t bother us much
@@ -52,10 +52,9 @@ namespace Spard.Expressions
                 workingContext = initContext;
             }
 
-            bool res = false;
             if (lastChance)
             {
-                res = _operand.Match(input, ref workingContext, next);
+                var res = _operand.Match(input, ref workingContext, next);
                 if (!res)
                 {
                     lastChance = false; // We use match with emptiness

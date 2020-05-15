@@ -13,12 +13,12 @@ namespace Spard.Expressions
         /// </summary>
         protected internal abstract Relationship OperandPosition { get; }
 
-        public Unary()
+        protected Unary()
         {
             
         }
 
-        public Unary(Expression operand)
+        protected Unary(Expression operand)
             : base(operand)
         {
             

@@ -13,8 +13,8 @@ namespace Spard
     /// <typeparam name="TOutput">Type of output data of the transformer chain</typeparam>
     internal sealed class TransformersChain: Transformer
     {
-        private ITransformer _input = null;
-        private ITransformer _output = null;
+        private readonly ITransformer _input = null;
+        private readonly ITransformer _output = null;
 
         public override event Action<int> ProgressChanged
         {
@@ -28,12 +28,12 @@ namespace Spard
             _output = output;
         }
 
-        public override IEnumerable<object> Transform(IEnumerable input, CancellationToken cancellationToken = default(CancellationToken))
+        public override IEnumerable<object> Transform(IEnumerable input, CancellationToken cancellationToken = default)
         {
             return _output.Transform(_input.Transform(input, cancellationToken), cancellationToken);
         }
 
-        public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default(CancellationToken))
+        public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default)
         {
             return _output.StepTransform(_input.Transform(input, cancellationToken), cancellationToken);
         }

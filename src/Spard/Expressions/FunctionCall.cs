@@ -308,8 +308,8 @@ namespace Spard.Expressions
             }
             else
             {
-                _name = args.operands[0] as StringValueMatch;
-                this.Args = new TupleValueMatch(args.operands.Skip(1).ToArray());
+                _name = args._operands[0] as StringValueMatch;
+                this.Args = new TupleValueMatch(args._operands.Skip(1).ToArray());
             }
         }
     }

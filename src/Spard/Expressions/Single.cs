@@ -29,12 +29,12 @@ namespace Spard.Expressions
             _operand = operands.FirstOrDefault() ?? Empty.Instance;
         }
 
-        public Single()
+        protected Single()
         {
 
         }
 
-        public Single(Expression operand)
+        protected Single(Expression operand)
         {
             _operand = operand;
         }

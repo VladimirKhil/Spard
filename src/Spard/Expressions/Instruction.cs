@@ -85,13 +85,13 @@ namespace Spard.Expressions
 			{
 				if (_operand is TupleValueMatch list)
 				{
-					if (Modifiers.ContainsKey(list.operands[0].ToString()))
+					if (Modifiers.ContainsKey(list._operands[0].ToString()))
 					{
                         var ops = new List<Expression>(0)
                         {
                             new StringValueMatch("on")
                         };
-                        ops.AddRange(list.operands);
+                        ops.AddRange(list._operands);
 
 						_operand = new TupleValueMatch(ops.ToArray());
 					}
@@ -172,7 +172,7 @@ namespace Spard.Expressions
             Expression[] arguments;
             if (expressionList != null)
             {
-                arguments = expressionList.operands;
+                arguments = expressionList._operands;
             }
             else
             {
@@ -183,11 +183,11 @@ namespace Spard.Expressions
             {
                 case "foreach":
                     {
-                        if (!(arguments[2] is FunctionCall call))
+                        if (!(arguments[2] is FunctionCall))
                             break;
 
                         ContextParameter parameter = null;
-                        if (expressionList.operands.Length > 3)
+                        if (expressionList._operands.Length > 3)
                             parameter = workingContext.UseParameter(Parameters.Left);
 
                         var val = arguments[2].Apply(next ? null : workingContext);
@@ -397,17 +397,8 @@ namespace Spard.Expressions
                 return unification.Unify(context) ? null : BindingManager.NullValue;
             }
 
-            Expression[] arguments = null;
-
-            if (_operand is TupleValueMatch expressionList)
-            {
-                arguments = expressionList.operands;
-            }
-            else
-            {
-                arguments = new Expression[] { _operand };
-            }
-
+            Expression[] arguments = _operand is TupleValueMatch expressionList ? expressionList._operands : (new Expression[] { _operand });
+            
             switch (arguments[0].ToString())
             {
                 case "cont":
@@ -487,22 +478,12 @@ namespace Spard.Expressions
 
         internal override TransitionTable BuildTransitionTableCore(TransitionSettings settings, bool isLast)
         {
-            Expression[] arguments = null;
-
-            if (_operand is TupleValueMatch expressionList)
-            {
-                arguments = expressionList.operands;
-            }
-            else
-            {
-                arguments = new Expression[] { _operand };
-            }
-
+            var arguments = _operand is TupleValueMatch expressionList ? expressionList._operands : (new Expression[] { _operand });
+            
             switch (arguments[0].ToString())
             {
                 case "any":
-                    var stringValue = Argument as StringValueMatch;
-                    if (stringValue == null)
+                    if (!(Argument is StringValueMatch stringValue))
                         throw new NotImplementedException();
 
                     var result = new TransitionTable();
@@ -532,17 +513,8 @@ namespace Spard.Expressions
             if (_operand is Unification || _operand is FunctionCall)
                 return true;
 
-            Expression[] arguments = null;
-
-            if (_operand is TupleValueMatch expressionList)
-            {
-                arguments = expressionList.operands;
-            }
-            else
-            {
-                arguments = new Expression[] { _operand };
-            }
-
+            var arguments = _operand is TupleValueMatch expressionList ? expressionList._operands : (new Expression[] { _operand });
+            
             switch (arguments[0].ToString())
             {
                 case "foreach":
@@ -568,8 +540,7 @@ namespace Spard.Expressions
                     if (arguments.Length < 2)
                         return false;
 
-                    Parameters parameter;
-                    return Modifiers.TryGetValue(arguments[1].ToString(), out parameter);
+                    return Modifiers.TryGetValue(arguments[1].ToString(), out _);
 
                 case "madd":
                     return arguments.Length >= 2 && arguments.Length <= 3;

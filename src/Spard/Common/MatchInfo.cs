@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Spard.Common
 {
@@ -13,19 +14,19 @@ namespace Spard.Common
         /// The fatherst position in input which belongs to match
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private int _index = -1;
+        private readonly int _index = -1;
 
         /// <summary>
         /// Call stack of expressions
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private StackFrame[] _stackTrace = null;
+        private readonly StackFrame[] _stackTrace = null;
 
         /// <summary>
         /// Matches themselves
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private object _match = null;
+        private readonly object _match = null;
 
         /// <summary>
         /// The fatherst position in input which belongs to match
@@ -35,7 +36,7 @@ namespace Spard.Common
         /// <summary>
         /// Call stack of expressions
         /// </summary>
-        public StackFrame[] StackTrace { get { return _stackTrace; } }
+        public IEnumerable<StackFrame> StackTrace => _stackTrace;
 
         /// <summary>
         /// Matches themselves
@@ -118,11 +119,6 @@ namespace Spard.Common
             if (_match == null && other._match != null)
                 return -1;
 
-            return CompareMatches(_match, other._match);
-        }
-
-        private int CompareMatches(object match1, object match2)
-        {
             return 0;
         }
 
@@ -137,6 +133,66 @@ namespace Spard.Common
             }
 
             return result.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj is null)
+            {
+                return false;
+            }
+
+            if (obj is MatchInfo other)
+            {
+                return CompareTo(other) == 0;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return _index.GetHashCode() * 31 + _stackTrace.Length.GetHashCode();
+        }
+
+        public static bool operator ==(MatchInfo left, MatchInfo right)
+        {
+            if (left is null)
+            {
+                return right is null;
+            }
+
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(MatchInfo left, MatchInfo right)
+        {
+            return !(left == right);
+        }
+
+        public static bool operator <(MatchInfo left, MatchInfo right)
+        {
+            return left is null ? right is object : left.CompareTo(right) < 0;
+        }
+
+        public static bool operator <=(MatchInfo left, MatchInfo right)
+        {
+            return left is null || left.CompareTo(right) <= 0;
+        }
+
+        public static bool operator >(MatchInfo left, MatchInfo right)
+        {
+            return left is object && left.CompareTo(right) > 0;
+        }
+
+        public static bool operator >=(MatchInfo left, MatchInfo right)
+        {
+            return left is null ? right is null : left.CompareTo(right) >= 0;
         }
     }
 }

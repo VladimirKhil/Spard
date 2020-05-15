@@ -21,9 +21,6 @@ namespace Spard.Test
             All = 7
         }
 
-        // TODO: remove and make separate tests
-        private static readonly TableTestModes TableTestMode = TableTestModes.Script;
-
         [Test]
         public void Test()
         {
@@ -102,7 +99,10 @@ namespace Spard.Test
             RunTableTest("($w :: ab)c => $w\n$w :: _ => $w", "a", "abc", "def");
         }
 
-        private static void RunTableTest(string transform, params string[] tests)
+        private static void RunTableTest(string transform, params string[] tests) =>
+            RunTableTest(transform, tests, TableTestModes.Script);
+
+        private static void RunTableTest(string transform, string[] tests, TableTestModes tableTestMode)
         {
             var transformer = TreeTransformer.Create(transform);
             transformer.Mode = TransformMode.Reading;
@@ -110,12 +110,10 @@ namespace Spard.Test
             var tableTransformer = transformer.BuildTableTransformer();
 
             TableTransformer tableTransformer2 = null;
-            if ((TableTestMode & TableTestModes.SaveLoad) > 0)
+            if ((tableTestMode & TableTestModes.SaveLoad) > 0)
             {
                 var ms = new MemoryStream();
                 tableTransformer.Save(ms);
-
-                var str = Encoding.UTF8.GetString(ms.ToArray());
 
                 var ms2 = new MemoryStream(ms.ToArray());
 
@@ -126,13 +124,11 @@ namespace Spard.Test
 
                 var ms3 = new MemoryStream();
                 tableTransformer2.Save(ms3);
-
-                var str2 = Encoding.UTF8.GetString(ms3.ToArray());
             }
 
             CompiledTransformer transformerCS = null;
 
-            if ((TableTestMode & TableTestModes.Script) > 0)
+            if ((tableTestMode & TableTestModes.Script) > 0)
             {
                 transformerCS = tableTransformer.Compile();
             }
@@ -153,7 +149,7 @@ namespace Spard.Test
 
                 var sw3 = new Stopwatch();
 
-                if ((TableTestMode & TableTestModes.SaveLoad) > 0)
+                if ((tableTestMode & TableTestModes.SaveLoad) > 0)
                 {
                     sw3.Start();
                     var res3 = tableTransformer2.TransformToText(test);
@@ -163,7 +159,7 @@ namespace Spard.Test
                 }
 
                 var sw5 = new Stopwatch();
-                if ((TableTestMode & TableTestModes.Script) > 0)
+                if ((tableTestMode & TableTestModes.Script) > 0)
                 {
                     sw5.Start();
                     var tt = transformerCS.Transform(test).Cast<char>();

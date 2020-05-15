@@ -20,7 +20,7 @@ namespace Spard.Common
         /// <summary>
         /// Cached matches (kept for speed)
         /// </summary>
-        private List<MultiMatch> _matches = new List<MultiMatch>();
+        private readonly List<MultiMatch> _matches = new List<MultiMatch>();
         /// <summary>
         /// Index in _matches
         /// </summary>

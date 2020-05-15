@@ -14,7 +14,7 @@ namespace Spard.Expressions
         [DefaultValue(Directions.Right)]
         public Directions Direction { get; set; }
 
-        public Directed()
+        protected Directed()
         {
             Direction = Directions.Right;
         }
@@ -24,7 +24,7 @@ namespace Spard.Expressions
             Direction = direction;
         }
 
-        public Directed(Expression left, Expression right)
+        protected Directed(Expression left, Expression right)
             : base(left, right)
         {
             Direction = Directions.Right;

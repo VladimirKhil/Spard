@@ -42,7 +42,7 @@ namespace Spard
         /// <param name="input">Input stream</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Output stream</returns>
-        public static IEnumerable<object> Transform(this Transformer transformer, TextReader input, CancellationToken cancellationToken = default(CancellationToken))
+        public static IEnumerable<object> Transform(this Transformer transformer, TextReader input, CancellationToken cancellationToken = default)
         {
             return transformer.Transform(new TextReaderProxy(input), cancellationToken);
         }
@@ -128,7 +128,7 @@ namespace Spard
         /// <param name="input">Data source</param>        /// 
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Output portion stream</returns>
-        public static IEnumerable<IEnumerable<object>> StepTransform(this Transformer transformer, TextReader input, CancellationToken cancellationToken = default(CancellationToken))
+        public static IEnumerable<IEnumerable<object>> StepTransform(this Transformer transformer, TextReader input, CancellationToken cancellationToken = default)
         {
             return transformer.StepTransform(new TextReaderProxy(input), cancellationToken);
         }

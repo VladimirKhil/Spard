@@ -28,7 +28,7 @@ namespace Spard.Expressions
             public Stack<Expression> functions = new Stack<Expression>();
         }
 
-        private TextReader _text;
+        private readonly TextReader _text;
         private bool _disposeSource;
 
         private readonly bool _isStatement;
@@ -47,7 +47,7 @@ namespace Spard.Expressions
         /// The coordinates of the beginning of the expression in the source code (row and column number). Useful for debugging.
         /// The coordinates of the end of the expression aren't needed, because they are equal to the coordinates of the beginning of the next expression
         /// </summary>
-        private Dictionary<Expression, Tuple<int, int>> _coordinates = new Dictionary<Expression, Tuple<int, int>>();
+        private readonly Dictionary<Expression, Tuple<int, int>> _coordinates = new Dictionary<Expression, Tuple<int, int>>();
 
         public Tuple<int, int> GetCoordinates(Expression expr)
         {
@@ -65,7 +65,7 @@ namespace Spard.Expressions
         /// </summary>
         internal List<TableRecognizer> TableRecognizers { get; } = new List<TableRecognizer>();
 
-        private ParseData _parseData = new ParseData();
+        private readonly ParseData _parseData = new ParseData();
 
         /// <summary>
         /// Sets used in expresion
@@ -181,9 +181,8 @@ namespace Spard.Expressions
                         else if (_parseData.data.Count > 0)
                         {
                             var val = _parseData.data.Last.Value;
-                            var seq = val as Sequence;
-                            
-                            if (_parseData.data.Count != 1 || seq == null || seq.operands != null)
+
+                            if (_parseData.data.Count != 1 || !(val is Sequence seq) || seq._operands != null)
                                 if (insideInstruction || CheckExpression(val))
                                     yield return val;
 
@@ -634,10 +633,10 @@ namespace Spard.Expressions
                     if (parent is Definition def && def.Left == item) // This is the name of the set being defined
                         continue;
 
-                    if (parent is Instruction inst && inst.Operand is TupleValueMatch tv && tv.operands.Length == 2 && tv.operands[0].ToString() == "on" && tv.operands[1].ToString() == "m")
+                    if (parent is Instruction inst && inst.Operand is TupleValueMatch tv && tv._operands.Length == 2 && tv._operands[0].ToString() == "on" && tv._operands[1].ToString() == "m")
                         continue;
 
-                    if (!(((TupleValueMatch)set.Operand).operands[0] is StringValueMatch localNameStr))
+                    if (!(((TupleValueMatch)set.Operand)._operands[0] is StringValueMatch localNameStr))
                         continue; // Not processed yet
 
                     var localName = localNameStr.Value;
@@ -680,12 +679,12 @@ namespace Spard.Expressions
 
                 if (children[0] is TupleValueMatch list)
                 {
-                    if (ExtractName(list.operands[0], out globalName, out localName))
+                    if (ExtractName(list._operands[0], out globalName, out localName))
                     {
                         if (localName == "SP" || localName == "BR" || localName == "s" || localName == "t" || localName == "d" || localName == "i")
                             return;
 
-                        SetCalls[parent] = Tuple.Create(globalName, localName, list.operands.Length);
+                        SetCalls[parent] = Tuple.Create(globalName, localName, list._operands.Length);
                         return;
                     }
                 }
@@ -704,7 +703,7 @@ namespace Spard.Expressions
             return _parseData.data.AddLast(expr);
         }
 
-        private Dictionary<string, StringValueMatch> stringValueCache;
+        private readonly Dictionary<string, StringValueMatch> stringValueCache;
 
         private void FinishString()
         {
@@ -778,22 +777,21 @@ namespace Spard.Expressions
             if (instr.Operand is StringValueMatch str)
                 return str.Value == "simplematch" || str.Value == "suppressinline";
 
-            if (!(instr.Operand is TupleValueMatch list) || list.operands.Length < 2 || list.operands.Length > 3)
+            if (!(instr.Operand is TupleValueMatch list) || list._operands.Length < 2 || list._operands.Length > 3)
                 return false;
 
-            if (!(list.operands[0] is StringValueMatch name))
+            if (!(list._operands[0] is StringValueMatch name))
                 return false;
 
             if (name.Value != "module" && name.Value != "optimize" && name.Value != "compile")
                 return false;
 
-            var module = list.operands[1] as StringValueMatch;
             if (name == null)
                 return false;
 
-            if (list.operands.Length == 3)
+            if (list._operands.Length == 3)
             {
-                if (list.operands[2] as StringValueMatch == null)
+                if (list._operands[2] as StringValueMatch == null)
                     return false;
             }
 
@@ -820,17 +818,19 @@ namespace Spard.Expressions
         /// </summary>
         private void ParseInstruction()
         {
-            int sym = -1, next = -1;
-            char c = (char)0, nextC = (char)0;
+            char c = (char)0;
 
             var breakAll = false;
 
             var instruction = new Instruction();
 
             AppendInstruction(instruction);
+            int sym;
             while (!breakAll && (sym = ReadChar()) != -1 && (c = (char)sym) != '\n' && c != ']')
             {
-                Expression newExpr = null;
+                int next;
+                char nextC;
+                Expression newExpr;
                 switch (c)
                 {
                     case '\r':
@@ -841,7 +841,7 @@ namespace Spard.Expressions
                         if (next != -1)
                         {
                             nextC = (char)next;
-                            AppendCharInstruction(nextC, _text.Peek());
+                            AppendCharInstruction(nextC);
                         }
                         else
                             OnParseError("No escaped character after apostrophe");
@@ -857,7 +857,7 @@ namespace Spard.Expressions
                                 if (next != -1)
                                 {
                                     nextC = (char)next;
-                                    AppendCharInstruction(nextC, -1);
+                                    AppendCharInstruction(nextC);
                                 }
                                 else
                                     OnParseError("No escaped character after apostrophe");
@@ -865,7 +865,7 @@ namespace Spard.Expressions
                                 continue;
                             }
                             else
-                                AppendCharInstruction(c, -1);
+                                AppendCharInstruction(c);
                         }
                         continue;
 
@@ -948,13 +948,13 @@ namespace Spard.Expressions
                                     break;
 
                                 default:
-                                    AppendCharInstruction(c, next);
+                                    AppendCharInstruction(c);
                                     continue;
                             }
                         }
                         else
                         {
-                            AppendCharInstruction(c, next);
+                            AppendCharInstruction(c);
                             continue;
                         }
 
@@ -1014,7 +1014,7 @@ namespace Spard.Expressions
                         continue;
 
                     default:
-                        AppendCharInstruction(c, _text.Peek());
+                        AppendCharInstruction(c);
                         continue;
                 }
 
@@ -1058,8 +1058,7 @@ namespace Spard.Expressions
         /// Add symbol to the instruction
         /// </summary>
         /// <param name="c">Symbol to add</param>
-        /// <param name="next">Next symbol code</param>
-        private void AppendCharInstruction(char c, int next)
+        private void AppendCharInstruction(char c)
         {
             if (!isBuilding)
             {
@@ -1113,7 +1112,7 @@ namespace Spard.Expressions
             stringValueBuilder.Append(c);
         }
 
-        private StringBuilder stringValueBuilder = new StringBuilder();
+        private readonly StringBuilder stringValueBuilder = new StringBuilder();
         private Tuple<int, int> stringValueStart;
         private bool isBuilding = false;
 
@@ -1230,7 +1229,7 @@ namespace Spard.Expressions
                 if (children[0] is StringValueMatch)
                     return;
 
-                if (children[0] is TupleValueMatch list && list.operands.Length > 0 && list.operands[0] is StringValueMatch)
+                if (children[0] is TupleValueMatch list && list._operands.Length > 0 && list._operands[0] is StringValueMatch)
                     return;
 
                 if (children[0] is Query)
@@ -1253,7 +1252,7 @@ namespace Spard.Expressions
 
                 if (children[0] is TupleValueMatch list)
                 {
-                    if (ExtractName(list.operands[0], out globalName, out localName))
+                    if (ExtractName(list._operands[0], out globalName, out localName))
                     {
                         FunctionCalls[parent] = Tuple.Create(globalName, localName);
                         return;
@@ -1289,7 +1288,7 @@ namespace Spard.Expressions
             }
         }
 
-        private bool ExtractName(Expression expression, out string globalName, out string localName)
+        private static bool ExtractName(Expression expression, out string globalName, out string localName)
         {
             if (expression is StringValueMatch value)
             {

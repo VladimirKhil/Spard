@@ -8,19 +8,25 @@
         /// <summary>
         /// Set name and attributes
         /// </summary>
-        public string[] SetNameAndAttributes { get; internal set; }
+        private readonly string[] _setNameAndAttributes;
 
-        public override string Message
+        public override string Message => $"Set \"{string.Join(", ", _setNameAndAttributes)}\" definition was not found";
+
+        public SetDefinitionNotFoundException(string[] setNameAndAttributes)
         {
-            get
-            {
-                return string.Format("Set \"{0}\" definition was not found", string.Join(", ", SetNameAndAttributes));
-            }
+            _setNameAndAttributes = setNameAndAttributes;
+        }
+
+        public SetDefinitionNotFoundException(string message) : base(message)
+        {
+        }
+
+        public SetDefinitionNotFoundException(string message, System.Exception innerException) : base(message, innerException)
+        {
         }
 
         public SetDefinitionNotFoundException()
         {
-
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Spard.Expressions
         private IContext _initContext = null;
         private int _index = 0;
 
-        private Stack<int> _positions = new Stack<int>();
+        private readonly Stack<int> _positions = new Stack<int>();
         
         protected internal override Priorities Priority
         {
@@ -41,8 +41,7 @@ namespace Spard.Expressions
 
         internal override bool MatchCore(ISource input, ref IContext context, bool next)
         {
-            IContext workingContext = null;
-            
+            IContext workingContext;
             if (!next)
             {
                 _initContext = context; // If the match is successful, we will still rewrite the context. Otherwise the value of initContext doesn’t bother us much
@@ -54,15 +53,15 @@ namespace Spard.Expressions
             else
             {
                 workingContext = _initContext;
-                _index = operands.Length - 1;
+                _index = _operands.Length - 1;
 
                 input.Position = _positions.Pop();
             }
 
             _positions.Push(input.Position);
-            while (-1 < _index && _index < operands.Length)
+            while (-1 < _index && _index < _operands.Length)
             {
-                next = !operands[_index].Match(input, ref workingContext, next);
+                next = !_operands[_index].Match(input, ref workingContext, next);
                 _index += next ? -1 : 1;
 
                 if (next)
@@ -71,7 +70,7 @@ namespace Spard.Expressions
                     if (_index > -1)
                         input.Position = _positions.Peek();
                 }
-                else if (_index < operands.Length)
+                else if (_index < _operands.Length)
                     _positions.Push(input.Position);
             }
 
@@ -86,12 +85,12 @@ namespace Spard.Expressions
 
         internal override object Apply(IContext context)
         {
-            return ValueConverter.ConvertToEnumerable(operands.Select(item => item.Apply(context)));
+            return ValueConverter.ConvertToEnumerable(_operands.Select(item => item.Apply(context)));
         }
 
         internal override TransitionTable BuildTransitionTableCore(TransitionSettings settings, bool isLast)
         {
-            var table = operands[0].BuildTransitionTable(settings, false);
+            var table = _operands[0].BuildTransitionTable(settings, false);
 
             var result = new TransitionTable();
 
@@ -102,14 +101,14 @@ namespace Spard.Expressions
                 if (item.Key.Type == InputSetType.Zero) // Zero offset is processed separately
                 {
                     Expression next;
-                    if (operands.Length == 2)
+                    if (_operands.Length == 2)
                     {
-                        next = operands[1];
+                        next = _operands[1];
                     }
                     else
                     {
                         if (tail == null)
-                            tail = new Sequence(operands.Skip(1).ToArray());
+                            tail = new Sequence(_operands.Skip(1).ToArray());
 
                         next = tail;
                     }
@@ -117,7 +116,7 @@ namespace Spard.Expressions
                     var transitionResult = item.Value[0];
                     if (!transitionResult.IsFinished) // Postcondition
                     {
-                        if (next is MultiTime multiTime && multiTime.reversed && operands.Length == 2)
+                        if (next is MultiTime multiTime && multiTime.reversed && _operands.Length == 2)
                         {
                             InsertNewItem(result, item.Key, item.Value);
                             continue;
@@ -126,7 +125,7 @@ namespace Spard.Expressions
                         next = new And(next, new Sequence(transitionResult.Expression, new MultiTime(Any.Instance) { reversed = true }));
                     }
 
-                    var nextTable = next.BuildTransitionTable(settings, operands.Length == 2);
+                    var nextTable = next.BuildTransitionTable(settings, _operands.Length == 2);
                     foreach (var nextItem in nextTable)
                     {
                         InsertNewItem(result, nextItem.Key, nextItem.Value);
@@ -140,23 +139,23 @@ namespace Spard.Expressions
                     {
                         if (res.IsFinished)
                         {
-                            if (operands.Length == 2)
+                            if (_operands.Length == 2)
                             {
-                                collection.Add(new TransitionTableResult(operands[1], contextChange: res.ContextChange));
+                                collection.Add(new TransitionTableResult(_operands[1], contextChange: res.ContextChange));
                             }
                             else
                             {
                                 if (tail == null)
-                                    tail = new Sequence(operands.Skip(1).ToArray());
+                                    tail = new Sequence(_operands.Skip(1).ToArray());
 
                                 collection.Add(new TransitionTableResult(tail, contextChange: res.ContextChange));
                             }
                         }
                         else
                         {
-                            var newOperands = new Expression[operands.Length];
+                            var newOperands = new Expression[_operands.Length];
                             newOperands[0] = res.Expression;
-                            Array.Copy(operands, 1, newOperands, 1, operands.Length - 1);
+                            Array.Copy(_operands, 1, newOperands, 1, _operands.Length - 1);
                             collection.Add(new TransitionTableResult(new Sequence(newOperands), contextChange: res.ContextChange));
                         }
                     }
@@ -199,14 +198,14 @@ namespace Spard.Expressions
             if (!(other is Sequence sequence))
                 return false;
 
-            var length = operands.Length;
+            var length = _operands.Length;
 
-            if (length != sequence.operands.Length)
+            if (length != sequence._operands.Length)
                 return false;
 
             for (int i = 0; i < length; i++)
             {
-                if (!operands[i].Equals(sequence.operands[i]))
+                if (!_operands[i].Equals(sequence._operands[i]))
                     return false;
             }
 
@@ -220,19 +219,19 @@ namespace Spard.Expressions
 
         public override string ToString()
         {
-            if (operands == null)
+            if (_operands == null)
                 return GetType().ToString();
 
             var result = new StringBuilder();
 
-            for (int i = 0; i < operands.Length; i++)
+            for (int i = 0; i < _operands.Length; i++)
             {
-                var putBrackets = operands[i] is Query;
+                var putBrackets = _operands[i] is Query;
 
                 if (putBrackets)
                     result.Append('(');
 
-                base.AppendOperand(result, operands[i]);
+                base.AppendOperand(result, _operands[i]);
 
                 if (putBrackets)
                     result.Append(')');

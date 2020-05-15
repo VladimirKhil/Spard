@@ -140,8 +140,7 @@ namespace Spard.Transitions
                         continue;
                     }
 
-                    var bad = stateBase as BadTransitionState;
-                    if (bad != null)
+                    if (stateBase is BadTransitionState bad)
                     {
                         writer.Write('b');
                         writer.Write(bad.BadLength);
@@ -184,10 +183,7 @@ namespace Spard.Transitions
             }
         }
 
-        private string Escape(string s)
-        {
-            return s.Transform("'; => '\\'; \n '\\ => '\\'\\");
-        }
+        private static string Escape(string s) => s.Transform("'; => '\\'; \n '\\ => '\\'\\");
 
         internal static TransitionStateBase Load(System.IO.Stream stream)
         {

@@ -101,8 +101,7 @@ namespace Spard.Expressions
                 var leaf = this is Primitive && !(this is StringValueMatch);
                 if (!leaf)
                 {
-                    var set = this as Set;
-                    leaf = set != null && set._definition == null;
+                    leaf = this is Set set && set._definition == null;
                 }
 
                 if (leaf)

@@ -17,8 +17,8 @@
         internal ParseException(int lineNum, int columnNum, string message)
             : base(message)
         {
-            this.LineNum = lineNum;
-            this.ColumnNum = columnNum;
+            LineNum = lineNum;
+            ColumnNum = columnNum;
         }
 
         internal ParseException(string message)
@@ -27,9 +27,14 @@
 
         }
 
-        public override string ToString()
+        public ParseException()
         {
-            return string.Format("({0}, {1}) {2}", LineNum, ColumnNum, Message);
         }
+
+        public ParseException(string message, System.Exception innerException) : base(message, innerException)
+        {
+        }
+
+        public override string ToString() => $"({LineNum}, {ColumnNum}) {Message}";
     }
 }

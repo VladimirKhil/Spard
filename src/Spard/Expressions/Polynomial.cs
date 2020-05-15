@@ -9,11 +9,11 @@ namespace Spard.Expressions
     /// </summary>
     public abstract class Polynomial: Expression
     {
-        protected internal Expression[] operands = null;
+        protected internal Expression[] _operands = null;
 
         public override IEnumerable<Expression> Operands()
         {
-            return operands;
+            return _operands;
         }
 
         public override void SetOperands(IEnumerable<Expression> operands)
@@ -23,47 +23,41 @@ namespace Spard.Expressions
             foreach (var item in operands)
             {
                 if (GetType().Equals(item.GetType()))
-                    list.AddRange(((Polynomial)item).operands);
+                    list.AddRange(((Polynomial)item)._operands);
                 else
                     list.Add(item);
             }
 
-            this.operands = list.ToArray();
+            _operands = list.ToArray();
         }
 
-        public Expression[] OperandsArray
-        {
-            get { return operands; }
-            set { operands = value; }
-        }
-
-        public Polynomial()
+        protected Polynomial()
         {
         }
 
-        public Polynomial(IEnumerable<Expression> operands)
+        protected Polynomial(IEnumerable<Expression> operands)
         {
             SetOperands(operands);
         }
 
         internal override object Apply(IContext context)
         {
-            return operands[0].Apply(context);
+            return _operands[0].Apply(context);
         }
 
         public override string ToString()
         {
-            if (operands == null)
+            if (_operands == null)
                 return GetType().ToString();
 
             var result = new StringBuilder();
 
-            for (int i = 0; i < operands.Length; i++)
+            for (int i = 0; i < _operands.Length; i++)
             {
                 if (i > 0)
                     result.Append(Sign);
 
-                base.AppendOperand(result, operands[i]);
+                base.AppendOperand(result, _operands[i]);
             }
 
             return result.ToString();
@@ -72,11 +66,11 @@ namespace Spard.Expressions
         public override Expression CloneExpression()
         {
             var poly = (Polynomial)CloneCore();
-            poly.operands = new Expression[operands.Length];
+            poly._operands = new Expression[_operands.Length];
 
-            for (int i = 0; i < operands.Length; i++)
+            for (int i = 0; i < _operands.Length; i++)
             {
-                poly.operands[i] = operands[i].CloneExpression();
+                poly._operands[i] = _operands[i].CloneExpression();
             }
 
             return poly;

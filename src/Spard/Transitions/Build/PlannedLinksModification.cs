@@ -14,17 +14,17 @@ namespace Spard.Transitions
         /// <summary>
         /// Planned results inserts
         /// </summary>
-        private List<Tuple<TransitionLink, InsertResultAction>> plannedResuls = new List<Tuple<TransitionLink, InsertResultAction>>();
-        private List<Tuple<TransitionLink, PlannedLinksModification>> removers = new List<Tuple<TransitionLink, PlannedLinksModification>>();
+        private readonly List<Tuple<TransitionLink, InsertResultAction>> plannedResuls = new List<Tuple<TransitionLink, InsertResultAction>>();
+        private readonly List<Tuple<TransitionLink, PlannedLinksModification>> removers = new List<Tuple<TransitionLink, PlannedLinksModification>>();
 
         /// <summary>
         /// Actions that need to increase the depth
         /// </summary>
-        private List<ContextAction> toIncreaseDepth = new List<ContextAction>();
+        private readonly List<ContextAction> toIncreaseDepth = new List<ContextAction>();
         /// <summary>
         /// Actions that need to decrease the depth
         /// </summary>
-        private List<ContextAction> toDecreaseDepth = new List<ContextAction>();
+        private readonly List<ContextAction> toDecreaseDepth = new List<ContextAction>();
 
         /// <summary>
         /// Has this modification been made

@@ -14,7 +14,7 @@ namespace Spard.Expressions
     /// </summary>
     public sealed class TableRecognizer: Primitive
     {
-        private Expression _origin;
+        private readonly Expression _origin;
         private TransitionStateBase _initialState;
 
         private int _initStart, _currentPosition;
@@ -24,7 +24,7 @@ namespace Spard.Expressions
         private IContext _initContext;
 
         private bool _isFinished = false;
-        private List<CachedResult> _cachedResults = new List<CachedResult>();
+        private readonly List<CachedResult> _cachedResults = new List<CachedResult>();
         private int _cacheIndex = -1;
 
         /// <summary>

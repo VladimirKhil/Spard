@@ -95,7 +95,7 @@ namespace Spard.Exceptions
             return PrintStackTrace(BestTry.StackTrace);
         }
 
-        private string PrintStackTrace(IEnumerable<Spard.Common.StackFrame> stack)
+        private string PrintStackTrace(IEnumerable<StackFrame> stack)
         {
             var result = new StringBuilder();
             foreach (var item in stack)

@@ -66,7 +66,7 @@ namespace Spard.Common
         {
             // EnumerableValue does not expand into an IEnumerable intentionally (it was invented for this purpose)
             if (value == null)
-                return new object[0];
+                return Array.Empty<object>();
 
             if (value == BindingManager.NullValue)
                 return BindingManager.NullValue;

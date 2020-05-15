@@ -103,8 +103,7 @@ namespace Spard.Transitions
 
         public override bool Equals(object obj)
         {
-            var other = obj as TransitionTableResult;
-            if (other != null)
+            if (obj is TransitionTableResult other)
                 return Equals(other);
 
             return base.Equals(obj);

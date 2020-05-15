@@ -13,10 +13,8 @@ namespace Spard.Transitions
     /// </summary>
     internal sealed class TransitionGraphBuilder
     {
-        internal static TransitionStateBase Create(TransitionTableResultCollection collection, IExpressionRoot root, bool isExpression = false, Directions direction = Directions.Right, CancellationToken? cancellationToken = null)
-        {
-            return new TransitionGraphBuilder(cancellationToken ?? CancellationToken.None, root, isExpression, direction).Build(collection);
-        }
+        internal static TransitionStateBase Create(TransitionTableResultCollection collection, IExpressionRoot root, bool isExpression = false, Directions direction = Directions.Right, CancellationToken cancellationToken = default) =>
+            new TransitionGraphBuilder(root, isExpression, direction, cancellationToken).Build(collection);
 
         private CancellationToken _cancellationToken;
 
@@ -29,7 +27,7 @@ namespace Spard.Transitions
         /// Common set of states; allows you to repeatedly not create previously obtained states and organize circular references
         /// Stores links between records and states
         /// </summary>
-        private Dictionary<TransitionTableResultCollection, TransitionStateBase> _allStates = new Dictionary<TransitionTableResultCollection, TransitionStateBase>();
+        private readonly Dictionary<TransitionTableResultCollection, TransitionStateBase> _allStates = new Dictionary<TransitionTableResultCollection, TransitionStateBase>();
 
         /// <summary>
         /// Backlinks table
@@ -38,7 +36,7 @@ namespace Spard.Transitions
         /// <summary>
         /// Processing states queue
         /// </summary>
-        private Queue<TransitionState> _workingStates = new Queue<TransitionState>();
+        private readonly Queue<TransitionState> _workingStates = new Queue<TransitionState>();
 
         /// <summary>
         /// Initial state
@@ -53,19 +51,19 @@ namespace Spard.Transitions
         /// <summary>
         /// Dead-end states (may give the last partial result, but no longer lead to overall success)
         /// </summary>
-        private Dictionary<TransitionTableResultCollection, TransitionStateBase> _badStates = new Dictionary<TransitionTableResultCollection, TransitionStateBase>();
+        private readonly Dictionary<TransitionTableResultCollection, TransitionStateBase> _badStates = new Dictionary<TransitionTableResultCollection, TransitionStateBase>();
 
         /// <summary>
         /// States including result insertion points
         /// </summary>
-        private Dictionary<TransitionStateBase, PlannedLinksModification> _statesModifications = new Dictionary<TransitionStateBase, PlannedLinksModification>();
+        private readonly Dictionary<TransitionStateBase, PlannedLinksModification> _statesModifications = new Dictionary<TransitionStateBase, PlannedLinksModification>();
 
         /// <summary>
         /// Graph building settings
         /// </summary>
         private readonly TransitionSettings _settings;
 
-        private TransitionGraphBuilder(CancellationToken cancellationToken, IExpressionRoot root, bool isExpression, Directions direction)
+        private TransitionGraphBuilder(IExpressionRoot root, bool isExpression, Directions direction, CancellationToken cancellationToken = default)
         {
             _cancellationToken = cancellationToken;
             _settings = new TransitionSettings(root, direction);
@@ -120,44 +118,6 @@ namespace Spard.Transitions
         }
 
         /// <summary>
-        /// Try to perform state optimization
-        /// </summary>
-        /// <param name="workingState"></param>
-        private void Optimize(TransitionState workingState)
-        {
-            // If this state only absorbs characters until the input is complete, it can be processed faster
-            if (workingState.table.Count != 1 || workingState.secondTable.Count != 1)
-                return;
-
-            var singleMove = workingState.table.First();
-            var restMove = workingState.secondTable[0];
-
-            if (singleMove.Key != InputSet.EndOfSource || restMove.Item1 != InputSet.ExcludeEOS)
-                return;
-
-            var targetLink = singleMove.Value;
-            var currentLink = restMove.Item2;
-
-            var targetState = targetLink.State;
-            var currentState = currentLink.State;
-
-            if (!targetState.IsFinal || currentState != workingState)
-                return;
-
-            if (targetLink.Actions.Count > 0 || currentLink.Actions.Count != 1)
-                return;
-
-            if (!(currentLink.Actions[0] is AppendVarAction action) || action.Item != null || action.Depth != 0)
-                return;
-
-            var name = action.Name;
-            if (!(((FinalTransitionState)targetState).Result is Query query) || query.Name != name)
-                return;
-
-            var a = query.Name;
-        }
-
-        /// <summary>
         /// Process one of the transitions of the current transition table. Create new states if necessary
         /// </summary>
         /// <param name="workingState">Current state</param>
@@ -196,7 +156,7 @@ namespace Spard.Transitions
             if (!isBad && checkStateForExistence && _allStates.TryGetValue(collection, out TransitionStateBase state) && (!hasResult || workingState != _initialState || state != _initialState))
             {
                 isExisting = true;
-                ProcessExistingState(workingState, workingCollection, state, ref modification, ref modificationResult, ref delta, collection, last, actions, bottomModifications, hasResult, hasZeroResult, isFinal);
+                ProcessExistingState(workingCollection, state, ref modification, ref modificationResult, ref delta, collection, last, actions, bottomModifications, hasResult, hasZeroResult, isFinal);
             }
             else if (isBad && _badStates.TryGetValue(collection, out state))
             {
@@ -336,7 +296,7 @@ namespace Spard.Transitions
             return state;
         }
 
-        private void ProcessExistingState(TransitionState workingState, TransitionTableResultCollection workingCollection, TransitionStateBase state, ref PlannedLinksModification modification, ref Expression insertionResult, ref IEnumerable<PlannedLinksModification> delta, TransitionTableResultCollection collection, TransitionTableResult last, List<TransitionAction> actions, ModificationsList bottomModifications, bool hasResult, bool hasZeroResult, bool isFinal)
+        private void ProcessExistingState(TransitionTableResultCollection workingCollection, TransitionStateBase state, ref PlannedLinksModification modification, ref Expression insertionResult, ref IEnumerable<PlannedLinksModification> delta, TransitionTableResultCollection collection, TransitionTableResult last, List<TransitionAction> actions, ModificationsList bottomModifications, bool hasResult, bool hasZeroResult, bool isFinal)
         {
             // Some variables may need to be renamed
             var currentVars = collection.UsedVars;

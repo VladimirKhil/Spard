@@ -8,8 +8,8 @@ namespace Spard.Sources
 {
     internal sealed class StreamSource : ISource
     {
-        private Stream _source = null;
-        private List<char> _buffer = new List<char>();
+        private readonly Stream _source = null;
+        private readonly List<char> _buffer = new List<char>();
         private int _index = 0;
 
         public StreamSource(Stream source)

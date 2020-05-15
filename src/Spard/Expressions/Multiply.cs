@@ -29,7 +29,7 @@ namespace Spard.Expressions
         internal override object Apply(IContext context)
         {
             BigInteger total = 1;
-            foreach (var item in operands)
+            foreach (var item in _operands)
             {
                 total *= ValueConverter.ConvertToNumber(item.Apply(context));
             }

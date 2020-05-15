@@ -39,12 +39,12 @@ namespace Spard.Expressions
             set { _right = value; }
         }
 
-        public Binary()
+        protected Binary()
         {
 
         }
 
-        public Binary(Expression left, Expression right)
+        protected Binary(Expression left, Expression right)
         {
             _left = left;
             _right = right;

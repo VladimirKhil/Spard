@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Spard.Core;
 using Spard.Sources;
 using Spard.Transitions;
-using Spard.Common;
-using Spard.Core;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Spard.Expressions
 {
@@ -103,15 +102,12 @@ namespace Spard.Expressions
         internal override TransitionTable BuildTransitionTableCore(TransitionSettings settings, bool isLast)
         {
             var table = _operand.BuildTransitionTable(settings, false);
-            var result = new TransitionTable();
-
-            // Zero shift is possible at first
-            // BUT: with the condition that subsequent nodes check our condition
-            var not = _operand as Not;
-            result[InputSet.Zero] = TransitionTableResultCollection.Create(not != null ? not._operand : new Not(_operand));
-
-            //if (isLast)
-            //    return result;
+            var result = new TransitionTable
+            {
+                // Zero shift is possible at first
+                // BUT: with the condition that subsequent nodes check our condition
+                [InputSet.Zero] = TransitionTableResultCollection.Create(_operand is Not not ? not._operand : new Not(_operand))
+            };
 
             // Shifts by one character are possible futher
             var negativeKey = new InputSet(InputSetType.Exclude);

@@ -28,7 +28,7 @@ namespace Spard
         /// <param name="input">Input data stream</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Output data stream</returns>
-        public abstract IEnumerable<object> Transform(IEnumerable input, CancellationToken cancellationToken = default(CancellationToken));
+        public abstract IEnumerable<object> Transform(IEnumerable input, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Perform multivalue transformation of input data stream
@@ -36,12 +36,12 @@ namespace Spard
         /// <param name="input">Input data stream</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Set of multivalue results of output data</returns>
-        public IMultiResult MultiTransform(IEnumerable input, CancellationToken cancellationToken = default(CancellationToken))
+        public IMultiResult MultiTransform(IEnumerable input, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public abstract IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default(CancellationToken));
+        public abstract IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Merge with another transformer using another transformer as a data source

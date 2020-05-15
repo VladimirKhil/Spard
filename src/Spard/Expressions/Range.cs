@@ -21,7 +21,7 @@ namespace Spard.Expressions
         private int _lowerNumber = 0;
         private int _upperNumber = 0;
 
-        private List<int> _matches = new List<int>();
+        private readonly List<int> _matches = new List<int>();
         private int _count = 0;
 
         protected internal override Priorities Priority

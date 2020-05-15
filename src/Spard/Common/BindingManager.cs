@@ -16,7 +16,7 @@ namespace Spard.Common
         /// <summary>
         /// Incorrect value
         /// </summary>
-        internal static object[] NullValue = new object[0];
+        internal static object[] NullValue = System.Array.Empty<object>();
 
         internal static bool CompareValues(object leftValue, object rightValue)
         {
@@ -50,7 +50,6 @@ namespace Spard.Common
 
             if (enumerable != null)
             {
-                var result = Enumerable.Empty<object>();
                 foreach (var item in enumerable)
                 {
                     foreach (var obj in Enumerate(item))
@@ -63,21 +62,6 @@ namespace Spard.Common
             }
 
             yield return value;
-        }
-
-        private static bool CompareCollectionWithValue(IEnumerable collection, object value)
-        {
-            var enumerator = collection.GetEnumerator();
-            if (!enumerator.MoveNext())
-                return false;
-
-            if (!object.Equals(enumerator.Current, value))
-                return false;
-
-            if (enumerator.MoveNext())
-                return false;
-
-            return true;
         }
 
         internal static bool Unify(Expression targetExpression, Expression sourceExpression, IContext targetContext, IContext sourceContext, out BindingFormula bindingFormula)
@@ -117,8 +101,6 @@ namespace Spard.Common
             CheckDefined(otherExpression, context, vars);
 
             var definedOther = !vars.Any();
-
-            var definedValue = definedExpression.Apply(context);
 
             if (definedOther)
                 return CompareValues(definedExpression.Apply(context), otherExpression.Apply(context));
@@ -163,9 +145,9 @@ namespace Spard.Common
 
             if (expression is TupleValueMatch tupleValueMatch)
             {
-                if (tupleValueMatch.operands.Length == 1)
+                if (tupleValueMatch._operands.Length == 1)
                 {
-                    return Bind(tupleValueMatch.operands[0], context, value);
+                    return Bind(tupleValueMatch._operands[0], context, value);
                 }
                 else
                 {
@@ -173,11 +155,11 @@ namespace Spard.Common
 
                     if (single is TupleValue tupleValue)
                     {
-                        if (tupleValueMatch.operands.Length == tupleValue.Items.Length)
+                        if (tupleValueMatch._operands.Length == tupleValue.Items.Length)
                         {
                             for (int i = 0; i < tupleValue.Items.Length; i++)
                             {
-                                Bind(tupleValueMatch.operands[i], context, tupleValue.Items[i]);
+                                Bind(tupleValueMatch._operands[i], context, tupleValue.Items[i]);
                             }
 
                             return true;
@@ -201,7 +183,7 @@ namespace Spard.Common
         {
             foreach (var item in unificationContext.BindingTable)
             {
-                if (item.Key is Query query)
+                if (item.Key is Query)
                 {
                     var value = item.Value.Apply(sourceContext);
 
@@ -212,12 +194,6 @@ namespace Spard.Common
                 {
                     if (item.Key is FunctionCall functionCall)
                     {
-                        //var backFunction = new FunctionCall();
-                        //backFunction.SetOperands(new Expression[] { new TupleValueMatch(new StringValueMatch(functionCall.Name), item.Value.CloneExpression()) });
-                        //var param = sourceContext.UseParameter(Parameters.Left);
-                        //var value = backFunction.Apply(sourceContext);
-                        //param.Free(sourceContext);
-
                         var value = FunctionCall.Call(functionCall.Name, new object[] { item.Value.Apply(sourceContext) }, sourceContext, Relationship.Left);
                         Bind(functionCall.Args, targetContext, value);
                     }

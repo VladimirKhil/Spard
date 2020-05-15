@@ -23,7 +23,6 @@ namespace Spard.Compilation.CSharp
 
             var sb = new StringBuilder();
 
-            var tab = new string(' ', indent * 4);
             sb.Append(base.ToString(indent)).AppendLine();
             sb.Append(_child.ToString(indent + 1));
 

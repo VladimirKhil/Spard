@@ -12,6 +12,8 @@ namespace Spard.Core
     /// </summary>
     public sealed class RuntimeInfo: IRuntimeInfo
     {
+        private readonly Dictionary<Instruction, CacheData> _cache = new Dictionary<Instruction, CacheData>();
+
         /// <summary>
         /// Call stack
         /// </summary>
@@ -57,15 +59,13 @@ namespace Spard.Core
             CancellationToken = cancellationToken;
         }
 
-        private Dictionary<Instruction, CacheData> cache = new Dictionary<Instruction, CacheData>();
-
         CacheData IRuntimeInfo.GetDict(Instruction instruction)
         {
-            if (cache.TryGetValue(instruction, out CacheData result))
+            if (_cache.TryGetValue(instruction, out CacheData result))
                 return result;
 
             result = new CacheData();
-            cache[instruction] = result;
+            _cache[instruction] = result;
 
             return result;
         }

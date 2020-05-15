@@ -130,7 +130,7 @@ namespace Spard.Transitions
         /// </summary>
         /// <param name="tables">Таблицы перехода</param>
         /// <returns>Общая таблица перехода</returns>
-        internal static TransitionTable Intersect(TransitionTable[] tables, bool isLast)
+        internal static TransitionTable Intersect(TransitionTable[] tables)
         {
             if (tables.Length == 0)
                 return new TransitionTable();
@@ -253,8 +253,7 @@ namespace Spard.Transitions
                     {
                         var multiZeros = nonEmpty.Where(expr =>
                         {
-                            var multiTime = (hasEmpty ? ((ZeroMoveProxy)expr).Operand : expr) as MultiTime;
-                            return multiTime != null && multiTime.reversed;
+                            return (hasEmpty ? ((ZeroMoveProxy)expr).Operand : expr) is MultiTime multiTime && multiTime.reversed;
                         }).ToArray();
 
                         if (multiZeros.Length < nonEmpty.Length - 1)
@@ -291,21 +290,19 @@ namespace Spard.Transitions
 
         private static bool IsOpposite(Expression a, Expression b)
         {
-            var and = a as And;
-            if (and != null)
+            if (a is And and)
             {
-                return and.operands.Any(op => IsOpposite(op, b));
+                return and._operands.Any(op => IsOpposite(op, b));
             }
 
             and = b as And;
             if (and != null)
             {
-                return and.operands.Any(op => IsOpposite(a, op));
+                return and._operands.Any(op => IsOpposite(a, op));
             }
 
-            var not = a as Not;
             var not2 = b as Not;
-            if (not != null)
+            if (a is Not not)
             {
                 if (not2 != null)
                     return IsOpposite(not.Operand, not2.Operand);

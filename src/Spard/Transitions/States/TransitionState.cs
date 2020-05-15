@@ -28,8 +28,7 @@ namespace Spard.Transitions
 
         protected internal override TransitionStateBase Move(object item, ref TransitionContext context, out IEnumerable result)
         {
-            TransitionLink next;
-            if (!table.TryGetValue(item, out next))
+            if (!table.TryGetValue(item, out TransitionLink next))
             {
                 foreach (var tuple in secondTable)
                 {

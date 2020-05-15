@@ -49,13 +49,13 @@ namespace Spard.Expressions
                 _index = 0;
 
                 var source = input.Read();
-				if (source is TupleValue tupleValue && tupleValue.Items.Length >= operands.Length)
+				if (source is TupleValue tupleValue && tupleValue.Items.Length >= _operands.Length)
 				{
 					_sources = tupleValue.Items.Select(item => ValueConverter.ConvertToSource(ValueConverter.ConvertToEnumerable(item))).ToArray();
 				}
 				else
 				{
-					if (source is TupleSource tupleSource && tupleSource.Sources.Length == operands.Length)
+					if (source is TupleSource tupleSource && tupleSource.Sources.Length == _operands.Length)
 					{
 						_sources = tupleSource.Sources;
 					}
@@ -72,12 +72,12 @@ namespace Spard.Expressions
             else
             {
                 workingContext = _initContext;
-                _index = operands.Length - 1;
+                _index = _operands.Length - 1;
             }
 
             var maxIndex = _index;
 
-            while (-1 < _index && _index < operands.Length)
+            while (-1 < _index && _index < _operands.Length)
             {
                 if (next)
                     _matchedIndicies[_index] = -1;
@@ -95,10 +95,10 @@ namespace Spard.Expressions
                 {
                     more = false;
 
-                    next = !operands[_index].Match(_sources[sourceIndex], ref workingContext, next);
+                    next = !_operands[_index].Match(_sources[sourceIndex], ref workingContext, next);
                     if (next) // Does not match
                     {
-                        if (operands[_index] is NamedValueMatch)
+                        if (_operands[_index] is NamedValueMatch)
                         {
                             // A special case; it is allowed to match the source on another index
                             sourceIndex++;
@@ -145,7 +145,7 @@ namespace Spard.Expressions
 
         internal override object Apply(IContext context)
         {
-            return new TupleValue { Items = operands.Select(item => item.Apply(context)).ToArray() };
+            return new TupleValue { Items = _operands.Select(item => item.Apply(context)).ToArray() };
         }
 
         public override Expression CloneCore()
@@ -157,7 +157,7 @@ namespace Spard.Expressions
         {
             get
             {
-                var op = operands[0].ToString();
+                var op = _operands[0].ToString();
                 return op == "on" || op == "off" || op == "time";
             }
         }

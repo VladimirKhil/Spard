@@ -6,7 +6,7 @@ namespace Spard.Compilation
 {
     internal sealed class IndentWriter: IDisposable
     {
-        private TextWriter _writer;
+        private readonly TextWriter _writer;
         private readonly bool _disposeWriter;
 
         public int Indent { get; set; }

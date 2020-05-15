@@ -17,7 +17,7 @@ namespace Spard.Core
         /// Context variables
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<string, object> _vars = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _vars = new Dictionary<string, object>();
 
         /// <summary>
         /// Information about current transformation
@@ -169,13 +169,12 @@ namespace Spard.Core
             if (_parameters != other.Parameters)
                 return false;
 
-            object val = null;
             foreach (var item in _vars)
             {
-                if (!Char.IsUpper(item.Key[0]) && item.Key[0] != '$')
+                if (!char.IsUpper(item.Key[0]) && item.Key[0] != '$')
                     continue;
 
-                if (!other.Vars.TryGetValue(item.Key, out val) || !object.Equals(item.Value, val))
+                if (!other.Vars.TryGetValue(item.Key, out object val) || !Equals(item.Value, val))
                     return false;
             }
 
@@ -296,8 +295,7 @@ namespace Spard.Core
             }
             else
             {
-                var newValue = value as NamedValue;
-                if (currentValue is NamedValue namedValue && newValue != null && namedValue.Name == newValue.Name)
+                if (currentValue is NamedValue namedValue && value is NamedValue newValue && namedValue.Name == newValue.Name)
                 {
                     if (namedValue.Value is object[] currentVals)
                     {

@@ -23,7 +23,7 @@ namespace Spard.Expressions
             
         }
 
-        public Primitive()
+        protected Primitive()
         {
             
         }

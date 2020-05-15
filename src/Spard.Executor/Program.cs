@@ -15,7 +15,7 @@ namespace Spard.Executor
     /// <summary>
     /// SPARD interpreter as a console application
     /// </summary>
-    public class Program
+    public static class Program
     {
         public static int Main(string[] args)
         {
@@ -62,6 +62,9 @@ namespace Spard.Executor
 
                 case "tablecompile":
                     return CreateCode(args, true);
+
+                default:
+                    break;
             }
 
             return 1;
@@ -190,10 +193,8 @@ namespace Spard.Executor
             }
             else
             {
-                using (var reader = new StreamReader(File.OpenRead(rulesFile)))
-                {
-                    transformer = BuildTransformer(rulesFile, reader);
-                }
+                using var reader = new StreamReader(File.OpenRead(rulesFile));
+                transformer = BuildTransformer(rulesFile, reader);
             }
 
             if (transformer == null)
@@ -301,10 +302,8 @@ namespace Spard.Executor
             }
             else
             {
-                using (var reader = new StreamReader(File.OpenRead(rulesFile)))
-                {
-                    transformer = BuildTransformer(rulesFile, reader);
-                }
+                using var reader = new StreamReader(File.OpenRead(rulesFile));
+                transformer = BuildTransformer(rulesFile, reader);
             }
 
             if (transformer == null)
@@ -313,7 +312,7 @@ namespace Spard.Executor
             if (maxMilliseconds > 0)
             {
                 var source = new CancellationTokenSource();
-                var task = Task.Run(() => VisualizeTable(transformer, source.Token), source.Token);
+                var task = Task.Run(() => VisualizeTable(transformer), source.Token);
                 source.CancelAfter(maxMilliseconds);
 
                 try
@@ -331,7 +330,7 @@ namespace Spard.Executor
                 return VisualizeTable(transformer);
         }
 
-        private static int VisualizeTable(TreeTransformer transformer, CancellationToken? cancellationToken = null)
+        private static int VisualizeTable(TreeTransformer transformer)
         {
             TableTransformer tableTransformer;
             try
@@ -404,10 +403,8 @@ namespace Spard.Executor
             }
             else
             {
-                using (var reader = new StreamReader(File.OpenRead(rulesFile)))
-                {
-                    transformer = BuildTransformer(rulesFile, reader);
-                }
+                using var reader = new StreamReader(File.OpenRead(rulesFile));
+                transformer = BuildTransformer(rulesFile, reader);
             }
 
             if (transformer == null)
@@ -474,7 +471,7 @@ namespace Spard.Executor
             return -3;
         }
 
-        private static int GenerateSource(TreeTransformer transformer, TextWriter writer, CancellationToken? cancellationToken = null)
+        private static int GenerateSource(TreeTransformer transformer, TextWriter writer, CancellationToken cancellationToken = default)
         {
             TableTransformer tableTransformer;
             try
@@ -532,7 +529,7 @@ namespace Spard.Executor
             Console.WriteLine("Shows help about this app");
         }
 
-        private static int Transform(TreeTransformer transformer, bool verbose, bool useTable, TextReader input, string inputFileName, CancellationToken cancellationToken = default(CancellationToken))
+        private static int Transform(TreeTransformer transformer, bool verbose, bool useTable, TextReader input, string inputFileName, CancellationToken cancellationToken = default)
         {
 #if DEBUG
             var t1 = DateTime.Now;

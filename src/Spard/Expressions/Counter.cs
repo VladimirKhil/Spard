@@ -10,7 +10,7 @@ namespace Spard.Expressions
     /// </summary>
     public sealed class Counter: Binary
     {
-        private MultiMatchManager manager = new MultiMatchManager();
+        private readonly MultiMatchManager manager = new MultiMatchManager();
 
         protected internal override Priorities Priority
         {
@@ -20,16 +20,6 @@ namespace Spard.Expressions
         protected internal override string Sign
         {
             get { return "#"; }
-        }
-
-        /// <summary>
-        /// Check if the number of matches is valid
-        /// </summary>
-        /// <param name="count">Number of template matches</param>
-        /// <returns>If the number of matches is valid</returns>
-        private bool CheckCount(int count)
-        {
-            return false;
         }
 
         private bool CheckCount(int count, ref IContext context, bool next)

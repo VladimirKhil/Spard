@@ -110,7 +110,7 @@ namespace Spard.Expressions
         {
             if (expression is Set set)
             {
-                var setDefinitions = root.GetSet("", set.Name, set.List.operands.Length);
+                var setDefinitions = root.GetSet("", set.Name, set.List._operands.Length);
                 var setDefinition = setDefinitions[0];
 
                 operandsChanged = true;

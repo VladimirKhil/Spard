@@ -38,7 +38,7 @@ namespace Spard.Expressions
 
         internal override bool MatchCore(ISource input, ref IContext context, bool next)
         {
-            IContext workingContext = null;
+            IContext workingContext;
             if (!next)
             {
                 _initContext = context; // If the match is successful, we will still rewrite the context. Otherwise the value of initContext doesn’t bother us much
@@ -50,9 +50,9 @@ namespace Spard.Expressions
                 workingContext = _initContext;
             }
             
-            while (_index < operands.Length)
+            while (_index < _operands.Length)
             {
-                if (operands[_index].Match(input, ref workingContext, next))
+                if (_operands[_index].Match(input, ref workingContext, next))
                 {
                     context = workingContext;
                     return true;
@@ -67,12 +67,12 @@ namespace Spard.Expressions
 
         internal override object Apply(IContext context)
         {
-            if (operands.Length == 0)
+            if (_operands.Length == 0)
                 return null;
 
-            for (int i = 0; i < operands.Length; i++)
+            for (int i = 0; i < _operands.Length; i++)
             {
-                var result = operands[i].Apply(context);
+                var result = _operands[i].Apply(context);
                 if (result != BindingManager.NullValue)
                     return result;
             }
@@ -82,7 +82,7 @@ namespace Spard.Expressions
 
         internal override TransitionTable BuildTransitionTableCore(TransitionSettings settings, bool isLast)
         {
-            var tables = this.operands.Select(expr => expr.BuildTransitionTable(settings, isLast));
+            var tables = this._operands.Select(expr => expr.BuildTransitionTable(settings, isLast));
             var table = TransitionTable.Join(tables.ToArray());
 
             var result = new TransitionTable();
@@ -144,14 +144,14 @@ namespace Spard.Expressions
             if (!(other is Or or))
                 return false;
 
-            var length = operands.Length;
+            var length = _operands.Length;
 
-            if (length != or.operands.Length)
+            if (length != or._operands.Length)
                 return false;
 
             for (int i = 0; i < length; i++)
             {
-                if (!or.operands[i].Equals(operands[i]))
+                if (!or._operands[i].Equals(_operands[i]))
                     return false;
             }
 

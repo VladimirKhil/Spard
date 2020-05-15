@@ -10,7 +10,7 @@ namespace Spard.Expressions
     /// </summary>
     public sealed class MultiTime : Unary
     {
-        private MultiMatchManager manager = new MultiMatchManager();
+        private readonly MultiMatchManager manager = new MultiMatchManager();
 
         protected internal override string Sign
         {

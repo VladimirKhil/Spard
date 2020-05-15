@@ -56,8 +56,8 @@ namespace Spard.Expressions
 				if (_operand is StringValueMatch stringValueMatch)
 					return stringValueMatch.Value;
 
-				if (this._operand is TupleValueMatch tupleValueMatch && tupleValueMatch.operands.Length > 0)
-					return tupleValueMatch.operands[0].ToString();
+				if (this._operand is TupleValueMatch tupleValueMatch && tupleValueMatch._operands.Length > 0)
+					return tupleValueMatch._operands[0].ToString();
 
 				return _operand.ToString();
             }
@@ -88,16 +88,16 @@ namespace Spard.Expressions
                 if (!(_operand is TupleValueMatch tuple))
                     throw new NotImplementedException();
 
-                if (!(tuple.operands[0] is StringValueMatch objName))
+                if (!(tuple._operands[0] is StringValueMatch objName))
                     throw new NotImplementedException();
 
                 if (!context.Vars.TryGetValue(objName.Value, out value))
                     return null;
 
                 var val = value;
-                for (int i = 1; i < tuple.operands.Length; i++)
+                for (int i = 1; i < tuple._operands.Length; i++)
                 {
-                    if (!(tuple.operands[i] is StringValueMatch stringQuery))
+                    if (!(tuple._operands[i] is StringValueMatch stringQuery))
                         throw new NotImplementedException();
 
                     var query = stringQuery.Value;
@@ -172,8 +172,7 @@ namespace Spard.Expressions
             if (!(_operand is StringValueMatch name))
                 throw new NotImplementedException();
 
-            IContext workingContext = null;
-
+            IContext workingContext;
             if (!next)
             {
                 _initStart = input.Position;
@@ -257,7 +256,7 @@ namespace Spard.Expressions
 
             if (_type is Or or)
             {
-                _enumerator = or.operands.Select(expr => expr.Apply(context)).GetEnumerator();
+                _enumerator = or._operands.Select(expr => expr.Apply(context)).GetEnumerator();
             }
         }
 

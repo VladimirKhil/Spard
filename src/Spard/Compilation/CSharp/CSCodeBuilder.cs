@@ -1,19 +1,17 @@
-﻿using System;
+﻿using Spard.Data;
+using Spard.Expressions;
+using Spard.Transitions;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Spard.Transitions;
-using System.Diagnostics;
-using Spard.Expressions;
-using Spard.Data;
 
 namespace Spard.Compilation.CSharp
 {
     /// <summary>
-    /// C # source code generator that performs equivalent transformation
+    /// C# source code generator that performs equivalent transformation
     /// </summary>
-    /// <typeparam name="TInput"></typeparam>
-    /// <typeparam name="TOutput"></typeparam>
     internal sealed class CSCodeBuilder
     {
         private readonly TransitionStateBase _initialState;
@@ -51,17 +49,9 @@ namespace Spard.Compilation.CSharp
         {
             var list = LoadStatesList();
 
-            //this.useContext = true;
-            //this.moreThanOneNormalState = true;
             _switchMode = list.Count < 1000;
-            //this.useError = true;
 
             WriteTransformerHeader(writer);
-
-            if (!_switchMode || _moreThanOneNormalState)
-            {
-                InitializeState(writer);
-            }
 
             if (_switchMode)
             {
@@ -135,32 +125,18 @@ namespace Spard.Compilation.CSharp
 
                 writer.Indent--;
                 writer.WriteLine("} while (isNotFinal);");
-            }            
-
-            //if (moreThanOneNormalState)
-            //{
-            //    writer.WriteLine();
-
-            //    writer.WriteLine("if (!this.beforeStart)");
-            //    writer.WriteLine("{");
-
-            //    WriteEndingSection(writer, list);
-
-            //    writer.WriteLine("}");
-            //}
+            }
 
             writer.WriteLine("}");
 
             WriteOtherFunctions(writer, list);
 
             writer.WriteLine("}");
-
-            //writer.WriteLine("}");
         }
 
         private void CreateRecognizerCode(IndentWriter writer)
         {
-            var list = LoadStatesList();
+            LoadStatesList();
 
             writer.Write(@"public sealed class CompiledRecognizer: Primitive
     {
@@ -178,16 +154,16 @@ namespace Spard.Compilation.CSharp
         private int cacheIndex = -1;
 
         /// <summary>
-        /// Сохранённое состояние успешного парсинга
+        /// Saved state of successfull parsing
         /// </summary>
         private sealed class CachedResult
         {
             /// <summary>
-            /// Позиция входа
+            /// Position in input
             /// </summary>
             public int InputPosition { get; set; }
             /// <summary>
-            /// Длины переменных
+            /// Variables length
             /// </summary>
             public Dictionary<string, int> VariablesLength { get; set; } = new Dictionary<string, int>();
         }
@@ -233,7 +209,7 @@ namespace Spard.Compilation.CSharp
                 this.cachedResults.Clear();
                 this.cacheIndex = -1;
 
-                // Может иметься промежуточный результат и для начального состояния
+                // There may be an intermediate result for the initial state
                 var resultIndex = this.currentState.IntermediateResultIndex;
                 if (resultIndex == -1)
                 {
@@ -242,7 +218,7 @@ namespace Spard.Compilation.CSharp
                 }
                 else if (resultIndex > -1)
                 {
-                    // Сохраняем результат
+                    // Saving result
                     var cachedResult = new CachedResult { InputPosition = input.Position };
 
                     foreach (var item in this.context.Vars)
@@ -274,7 +250,7 @@ namespace Spard.Compilation.CSharp
                     {
                         this.cacheIndex = this.cachedResults.Count - 1;
                         SetResult(input, ref context);
-                        return true; // Распознали некоторый фрагмент и хорошо - это нам и было нужно
+                        return true; // Some fragment is recognized - this is what we needed
                     }
 
                     input.Position = this.initStart;
@@ -299,7 +275,7 @@ namespace Spard.Compilation.CSharp
                 }
                 else if (resultIndex > -1)
                 {
-                    // Сохраняем результат
+                    // Saving result
                     var cachedResult = new CachedResult { InputPosition = input.Position };
 
                     foreach (var item in this.context.Vars)
@@ -317,7 +293,7 @@ namespace Spard.Compilation.CSharp
             {
                 this.cacheIndex = this.cachedResults.Count - 1;
                 SetResult(input, ref context);
-                return true; // Распознали некоторый фрагмент и хорошо - это нам и было нужно
+                return true; // Some fragment is recognized - this is what we needed
             }
 
             input.Position = this.initStart;
@@ -660,18 +636,6 @@ namespace Spard.Compilation.CSharp
             }
         }
 
-        private void InitializeState(IndentWriter writer)
-        {
-            if (_switchMode)
-            {
-                //writer.WriteLine("var state = 0;");
-            }
-            else
-            {
-                //writer.WriteLine("State state = F0;");
-            }
-        }
-
         private void GoToNextState(IndentWriter writer, string item, List<TransitionStateBase> list)
         {
             if (_switchMode)
@@ -741,11 +705,10 @@ namespace Spard.Compilation.CSharp
         private void WriteStateEOF(IndentWriter writer, List<TransitionStateBase> list, int i, TransitionStateBase stateBase)
         {
             if (i == 0)
-                return; // пока так
+                return; // Let it be for now
 
             var normalState = (TransitionState)stateBase;
-            TransitionLink link = null;
-            if (!normalState.table.TryGetValue(InputSet.EndOfSource, out link))
+            if (!normalState.table.TryGetValue(InputSet.EndOfSource, out TransitionLink link))
             {
                 foreach (var pair in normalState.secondTable)
                 {
@@ -760,7 +723,7 @@ namespace Spard.Compilation.CSharp
                     return;
             }
 
-            var linkCode = WriteLink(list, i, link, false);
+            var linkCode = WriteLink(list, i, link);
             if (linkCode.Count > 0)
             {
                 Statement statement = linkCode;
@@ -780,7 +743,7 @@ namespace Spard.Compilation.CSharp
             var normalState = (TransitionState)stateBase;
             var putElse = false;
 
-            // Все прочие символы
+            // All other symbols
             var exceptKey = InputSet.ExcludeEOS;
             var defaultSection = false;
 
@@ -804,7 +767,7 @@ namespace Spard.Compilation.CSharp
                         if (!first)
                             writer.WriteLine();
 
-                        var linkCode = WriteLink(list, i, item.Value, false);
+                        var linkCode = WriteLink(list, i, item.Value);
                         linkCode.Add("break;");
                         var statement = new ComplexStatement(string.Format("case '{0}':", item.Key), linkCode);
                         writer.WriteLine(statement.ToString(writer.Indent), false);
@@ -834,7 +797,7 @@ namespace Spard.Compilation.CSharp
                 else
                 {
                     var singleItem = allExceptEOF.First();
-                    var linkCode = WriteLink(list, i, singleItem.Value, false);
+                    var linkCode = WriteLink(list, i, singleItem.Value);
 
                     var conditionTextFormat = _charInput ? "item == '{0}'" : "object.Equals(item, '{0}')";
                     var conditionText = string.Format(conditionTextFormat, singleItem.Key);
@@ -849,7 +812,7 @@ namespace Spard.Compilation.CSharp
 
             if (!_switchMode && normalState.table.ContainsKey(InputSet.EndOfSource))
             {
-                var linkCode = WriteLink(list, i, normalState.table[InputSet.EndOfSource], false);
+                var linkCode = WriteLink(list, i, normalState.table[InputSet.EndOfSource]);
                 if (linkCode.Count > 0)
                 {
                     string mainText = "";
@@ -877,7 +840,7 @@ namespace Spard.Compilation.CSharp
                 var usedKey = _switchMode ? item.Item1.Except(InputSet.IncludeEOS) : item.Item1;
                 exceptKey = exceptKey.Except(item.Item1);
 
-                var linkCode = WriteLink(list, i, item.Item2, false);
+                var linkCode = WriteLink(list, i, item.Item2);
 
                 if (linkCode.Count > 0)
                 {
@@ -938,9 +901,9 @@ namespace Spard.Compilation.CSharp
                 }
             }
 
-            if (allExceptEOF.Length > 1) // писали switch, его надо закрыть
+            if (allExceptEOF.Length > 1) // we need to close `switch`
             {
-                if (defaultSection) // закрываем секцию default
+                if (defaultSection) // closing `default`
                 {
                     if (putBreak)
                         writer.WriteLine("break;");
@@ -1066,18 +1029,19 @@ namespace Spard.Compilation.CSharp
         }
 
         /// <summary>
-        /// Сначала произведём анализ. Выясним, что нам будет нужно выводить
+        /// First we’ll do the analysis and find out what we will need to output
         /// </summary>
-        /// <returns></returns>
         private List<TransitionStateBase> LoadStatesList()
         {
             var active = new Queue<TransitionStateBase>();
             active.Enqueue(_initialState);
 
-            var list = new List<TransitionStateBase>();
-            list.Add(_initialState);
+            var list = new List<TransitionStateBase>
+            {
+                _initialState
+            };
 
-            // Сначала заполним список всех состояний (так удобнее обращаться по индексу, плюс вычислим некоторые особенности графа)
+            // First, fill out the list of all states (it’s more convenient find them by the index, plus calculate some features of the graph)
             while (active.Any())
             {
 #if DEBUG
@@ -1147,8 +1111,7 @@ namespace Spard.Compilation.CSharp
                     continue;
                 }
 
-                var appendAction = action as AppendVarAction;
-                if (appendAction != null)
+                if (action is AppendVarAction appendAction)
                 {
                     if (appendAction.Depth > 0)
                         _useAppendDepth = true;
@@ -1156,8 +1119,7 @@ namespace Spard.Compilation.CSharp
                     _vars.Add(appendAction.Name);
                 }
 
-                var copyAction = action as CopyVarAction;
-                if (copyAction != null)
+                if (action is CopyVarAction copyAction)
                 {
                     if (copyAction.Depth > 0)
                         _useCopyDepth = true;
@@ -1174,18 +1136,16 @@ namespace Spard.Compilation.CSharp
                    : string.Join(" && ", inputSet.Values.Select(val => string.Format(_charInput ? "item != '{0}'" : "!object.Equals(item, '{0}')", val)));
         }
 
-        private bool IsLinkSimple(int rootIndex, TransitionLink link)
+        private static bool IsLinkSimple(int rootIndex, TransitionLink link)
         {
-            // специальная ситуация (но встречается часто): заполнение переменной и её немедленный возврат
+            // Special situation (but is common): filling in a variable and returning it immediately
             var state = link.State;
             if (rootIndex == 0 && state.IsFinal && link.Actions.Count == 1)
             {
                 var finalState = (FinalTransitionState)state;
-                var query = finalState.Result as Query;
-                if (query != null)
+                if (finalState.Result is Query query)
                 {
-                    var appendAction = link.Actions[0] as AppendVarAction;
-                    if (appendAction != null && appendAction.Name == query.Name && appendAction.Depth == 0)
+                    if (link.Actions[0] is AppendVarAction appendAction && appendAction.Name == query.Name && appendAction.Depth == 0)
                     {
                         return true;
                     }
@@ -1195,7 +1155,7 @@ namespace Spard.Compilation.CSharp
             return false;
         }
 
-        private StatementBlock WriteLink(List<TransitionStateBase> list, int rootIndex, TransitionLink link, bool final)
+        private StatementBlock WriteLink(List<TransitionStateBase> list, int rootIndex, TransitionLink link)
         {
             var block = new StatementBlock();
 
@@ -1211,11 +1171,9 @@ namespace Spard.Compilation.CSharp
                 var state = link.State;
                 if (state.IsFinal)
                 {
-                    bool needVars;
-                    bool isEnumerable;
                     if (_useContext)
                     {
-                        var result = CreateResultFromExpression(((FinalTransitionState)state).Result, out needVars, out isEnumerable);
+                        var result = CreateResultFromExpression(((FinalTransitionState)state).Result, out bool needVars, out bool isEnumerable);
                         if (result != null)
                         {
                             var currentBlock = block;
@@ -1288,20 +1246,14 @@ namespace Spard.Compilation.CSharp
                         }
                         else
                         {
-                            var result = CreateResultFromExpression(((FinalTransitionState)state).Result, out needVars, out isEnumerable);
+                            var result = CreateResultFromExpression(((FinalTransitionState)state).Result, out _, out _);
 
                             block.Add("result = {0};", result);
                             block.Add("return Reset();");
                         }
                     }
-
-                    //if (moreThanOneNormalState && !final)
-                    //{
-                    //    block.Add("state = 0;");
-                    //    block.Add("beforeStart = true;");
-                    //}
                 }
-                else // moreThanOneNormalState = true всегда в этом случае
+                else // moreThanOneNormalState = true always here
                 {
                     var index = list.IndexOf(state);
 
@@ -1334,8 +1286,7 @@ namespace Spard.Compilation.CSharp
             if (res is null)
                 return "null";
 
-            var tuple = res as TupleValue;
-            if (tuple != null)
+            if (res is TupleValue tuple)
             {
                 var sb = new StringBuilder("new TupleValue(");
 
@@ -1351,8 +1302,7 @@ namespace Spard.Compilation.CSharp
                 return sb.ToString();
             }
 
-            var named = res as NamedValue;
-            if (named != null)
+            if (res is NamedValue named)
             {
                 var sb = new StringBuilder("new NamedValue(\"")
                     .Append(named.Name).Append("\", ");
@@ -1379,8 +1329,7 @@ namespace Spard.Compilation.CSharp
         {
             foreach (var action in link.Actions)
             {
-                var append = action as AppendVarAction;
-                if (append != null)
+                if (action is AppendVarAction append)
                 {
                     if (append.Depth > 0)
                         block.Add("AppendVar(\"{0}\", item, {1});", append.Name, append.Depth);
@@ -1395,8 +1344,7 @@ namespace Spard.Compilation.CSharp
                     continue;
                 }
 
-                var copy = action as CopyVarAction;
-                if (copy != null)
+                if (action is CopyVarAction copy)
                 {
                     if (copy.Depth > 0)
                         block.Add("CopyVar(\"{0}\", \"{1}\", {2});", copy.SourceName, copy.TargetName, copy.Depth);
@@ -1411,22 +1359,20 @@ namespace Spard.Compilation.CSharp
                     continue;
                 }
 
-                var rename = action as RenameVarAction;
-                if (rename != null)
+                if (action is RenameVarAction rename)
                 {
                     block.Add("RenameVar(\"{0}\", \"{1}\");", rename.SourceName, rename.TargetName);
 
                     continue;
                 }
 
-                var insert = action as InsertResultAction;
-                if (insert != null)
+                if (action is InsertResultAction insert)
                 {
                     if (insert.Result == null)
                         block.Add("InsertResult({0});", insert.RemoveLastCount);
                     else
                     {
-                        var result = CreateResultFromExpression(insert.Result, out bool needVars, out bool isEnumerable);
+                        var result = CreateResultFromExpression(insert.Result, out bool needVars, out _);
 
                         if (insert.RemoveLastCount > 0)
                         {
@@ -1447,8 +1393,7 @@ namespace Spard.Compilation.CSharp
                     continue;
                 }
 
-                var returnResult = action as ReturnResultAction;
-                if (returnResult != null)
+                if (action is ReturnResultAction returnResult)
                 {
                     var call = returnResult.LeftResultsCount > 0 ? string.Format("ReturnResult({0})", returnResult.LeftResultsCount) : "ReturnResult()";
                     if (_switchMode)
@@ -1471,8 +1416,7 @@ namespace Spard.Compilation.CSharp
             if (expr == Empty.Instance)
                 return null;
 
-            var query = expr as Query;
-            if (query != null)
+            if (expr is Query query)
             {
                 needVars = true;
                 isEnumerable = true;
@@ -1482,20 +1426,18 @@ namespace Spard.Compilation.CSharp
                     return string.Format("this.{0}{1}", query.Name, _charInput ? ".ToString()" : "");
             }
 
-            var stringValue = expr as StringValueMatch;
-            if (stringValue != null)
+            if (expr is StringValueMatch stringValue)
             {
                 isEnumerable = true;
                 return string.Format("\"{0}\"", stringValue.Value);
             }
 
-            var sequence = expr as Sequence;
-            if (sequence != null)
+            if (expr is Sequence sequence)
             {
                 needVars = true;
 
                 var values = new List<string>();
-                foreach (var item in sequence.operands)
+                foreach (var item in sequence._operands)
                 {
                     if (item is Query subQuery)
                     {
@@ -1525,18 +1467,15 @@ namespace Spard.Compilation.CSharp
                 return sb.ToString();
             }
 
-            var tupleValueMatch = expr as TupleValueMatch;
-            if (tupleValueMatch != null)
+            if (expr is TupleValueMatch tupleValueMatch)
             {
                 var sb = new StringBuilder("new TupleValue(");
 
-                for (int i = 0; i < tupleValueMatch.operands.Length; i++)
+                for (int i = 0; i < tupleValueMatch._operands.Length; i++)
                 {
                     if (i > 0)
                         sb.Append(", ");
-
-                    bool isEnumerableLocal;
-                    sb.Append(CreateResultFromExpression(tupleValueMatch.operands[i], out bool needVarsLocal, out isEnumerableLocal));
+                    sb.Append(CreateResultFromExpression(tupleValueMatch._operands[i], out bool needVarsLocal, out _));
 
                     needVars |= needVarsLocal;
                 }
@@ -1545,16 +1484,14 @@ namespace Spard.Compilation.CSharp
                 return sb.ToString();
             }
 
-            var anything = expr as Anything;
-            if (anything != null)
+            if (expr is Anything)
                 return "null";
 
-            var or = expr as Or;
-            if (or != null)
+            if (expr is Or or)
             {
-                if (or.operands.Length > 0)
+                if (or._operands.Length > 0)
                 {
-                    return CreateResultFromExpression(or.operands[0], out needVars, out isEnumerable);
+                    return CreateResultFromExpression(or._operands[0], out needVars, out isEnumerable);
                 }
 
                 throw new NotImplementedException();

@@ -62,10 +62,10 @@ namespace Spard.Expressions
 
         internal string Name
         {
-            get { return ((StringValueMatch)List.operands[0]).ToString(); }
+            get { return ((StringValueMatch)List._operands[0]).ToString(); }
         }
 
-        private List<RecursiveTransformState> collectedResults = new List<RecursiveTransformState>();
+        private readonly List<RecursiveTransformState> collectedResults = new List<RecursiveTransformState>();
 
         public Set()
         {
@@ -105,14 +105,14 @@ namespace Spard.Expressions
 
                 initStart = input.Position;
 
-                localName = List.operands[0].Apply(workingContext);
+                localName = List._operands[0].Apply(workingContext);
 
                 if (localName == BindingManager.UnsetValue)
                 {
                     enumerate = true;
 
-                    ((Query)List.operands[0]).InitValuesEnumeration(workingContext);
-                    name = ((Query)List.operands[0]).EnumerateValue(ref workingContext);
+                    ((Query)List._operands[0]).InitValuesEnumeration(workingContext);
+                    name = ((Query)List._operands[0]).EnumerateValue(ref workingContext);
 
                     if (name == null)
                         return false;
@@ -151,7 +151,7 @@ namespace Spard.Expressions
                 if (!enumerate || result)
                     return result;
 
-                name = ((Query)List.operands[0]).EnumerateValue(ref workingContext);
+                name = ((Query)List._operands[0]).EnumerateValue(ref workingContext);
 
                 if (name == null)
                     return false;
@@ -502,9 +502,9 @@ namespace Spard.Expressions
 
             if (_definition == null)
             {
-                _definition = _initContext.Root.GetSet(module, name, List.operands.Length);
+                _definition = _initContext.Root.GetSet(module, name, List._operands.Length);
                 if (_definition == null)
-                    throw new SetDefinitionNotFoundException { SetNameAndAttributes = List.operands.Select(item => item.ToString()).ToArray() };
+                    throw new SetDefinitionNotFoundException(List._operands.Select(item => item.ToString()).ToArray());
             }
 
             if (!next)
@@ -572,7 +572,7 @@ namespace Spard.Expressions
                     // The key is determined by the name of the set, the actual values of the arguments and the position in the input
                     collectedResults.Clear();
 
-                    var args = List.operands.Skip(1).Select(op => op.Apply(workingContext)).ToArray();
+                    var args = List._operands.Skip(1).Select(op => op.Apply(workingContext)).ToArray();
                     var stateKey = new RecursiveStateKey(input.Position, name, args, _definitionIndex);
 
                     // The states variable holds a table of all the recursive states passed. Having found the second repeating state, we determine the left recursion
@@ -834,10 +834,10 @@ namespace Spard.Expressions
             var newContext = new Context(context);
             unificationContext = new UnificationContext();
 
-            for (int i = 1; i < List.operands.Length; i++)
+            for (int i = 1; i < List._operands.Length; i++)
             {
-                var sourceExpression = set.List.operands[i];
-                var targetExpression = List.operands[i];
+                var sourceExpression = set.List._operands[i];
+                var targetExpression = List._operands[i];
 
                 if (!BindingManager.Unify(targetExpression, sourceExpression, newContext, context, out BindingFormula bindingFormula))
                     return null;
@@ -866,7 +866,7 @@ namespace Spard.Expressions
             if (context.Runtime != null && context.Runtime.CancellationToken.IsCancellationRequested)
                 return null;
 
-            name = List.operands[0].Apply(context).ToString();
+            name = List._operands[0].Apply(context).ToString();
             module = "";
             switch (name)
             {
@@ -905,9 +905,9 @@ namespace Spard.Expressions
                         {
                             if (_definition == null)
                             {
-                                _definition = context.Root.GetSet(module, name, List.operands.Length);
+                                _definition = context.Root.GetSet(module, name, List._operands.Length);
                                 if (_definition == null)
-                                    throw new SetDefinitionNotFoundException() { SetNameAndAttributes = List.operands.Select(item => item.ToString()).ToArray() };
+                                    throw new SetDefinitionNotFoundException(List._operands.Select(item => item.ToString()).ToArray());
                             }
 
                             for (int i = 0; i < _definition.Length; i++)
@@ -938,7 +938,7 @@ namespace Spard.Expressions
 
         internal override TransitionTable BuildTransitionTableCore(TransitionSettings settings, bool isLast)
         {
-            if (List.operands[0] is StringValueMatch nameExpr)
+            if (List._operands[0] is StringValueMatch nameExpr)
             {
                 var name = nameExpr.Value;
                 switch (name)
@@ -970,7 +970,7 @@ namespace Spard.Expressions
                         }
 
                     default:
-                        var definition = settings.Root.GetSet("", name, List.operands.Length);
+                        var definition = settings.Root.GetSet("", name, List._operands.Length);
                         var tables = definition.Select(def => def.Right.BuildTransitionTable(settings, isLast)).ToArray();
                         return TransitionTable.Join(tables);
                 }

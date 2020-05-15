@@ -242,7 +242,7 @@ namespace Spard.Transitions
                     switch (s[i + 1])
                     {
                         case '0':
-                            c = default(char);
+                            c = default;
                             break;
 
                         case 'r':
