@@ -46,20 +46,20 @@ namespace Spard.Expressions
                 var namedValue = currentObject as NamedValue;
                 if (namedValue == null)
                 {
-					if (currentObject is TupleValue tupleValue)
-					{
-						foreach (var item in tupleValue.Items)
-						{
-							namedValue = item as NamedValue;
-							if (namedValue != null && _left.Match(ValueConverter.ConvertToSource(namedValue.Name), ref context, false))
-							{
-								checkedName = true;
-								break;
-							}
-						}
-					}
+                    if (currentObject is TupleValue tupleValue)
+                    {
+                        foreach (var item in tupleValue.Items)
+                        {
+                            namedValue = item as NamedValue;
+                            if (namedValue != null && _left.Match(ValueConverter.ConvertToSource(namedValue.Name), ref context, false))
+                            {
+                                checkedName = true;
+                                break;
+                            }
+                        }
+                    }
 
-					if (!checkedName)
+                    if (!checkedName)
                     {
                         input.Position = initStart;
                         return false;

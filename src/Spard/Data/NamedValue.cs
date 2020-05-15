@@ -36,7 +36,7 @@ namespace Spard.Data
         public override string ToString()
         {
             var format = Value is string || Value is char ? "{0}:{1}" : "{0}:{{{1}}}";
-			var value = ValueConverter.ConvertToString(Value);
+            var value = ValueConverter.ConvertToString(Value);
 
             return string.Format(format, ValueConverter.Escape(Name), value);
         }

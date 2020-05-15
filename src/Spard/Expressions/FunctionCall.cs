@@ -129,25 +129,25 @@ namespace Spard.Expressions
         {
             switch (name)
             {
-				case "bagAdd":
-					{
-						var bag = args[0];
-						var item = ValueConverter.ConvertToSingle(args[1]);
+                case "bagAdd":
+                    {
+                        var bag = args[0];
+                        var item = ValueConverter.ConvertToSingle(args[1]);
 
-						if (bag == BindingManager.UnsetValue)
-							return item;
+                        if (bag == BindingManager.UnsetValue)
+                            return item;
 
-						if (bag is TupleValue tupleValue)
-						{
-							var items = tupleValue.Items;
-							var newItems = new object[items.Length + 1];
-							Array.Copy(items, newItems, items.Length);
-							newItems[items.Length] = item;
-							return new TupleValue(newItems);
-						}
+                        if (bag is TupleValue tupleValue)
+                        {
+                            var items = tupleValue.Items;
+                            var newItems = new object[items.Length + 1];
+                            Array.Copy(items, newItems, items.Length);
+                            newItems[items.Length] = item;
+                            return new TupleValue(newItems);
+                        }
 
-						return new TupleValue(bag, item);
-					}
+                        return new TupleValue(bag, item);
+                    }
 
                 case "call": // Calling a function parsed from a string (metaprogramming)
                     {
@@ -169,62 +169,62 @@ namespace Spard.Expressions
                     }
 
                 case "foldl":
-					{
-						if (function == null)
-						{
-							function = context.Root.GetFunction("", (string)args[1], context.GetParameter(Parameters.Left) ? Directions.Left : Directions.Right); // Вызов пользовательской функции
-							if (function == null)
-								throw new FunctionDefinitionNotFoundException() { FunctionName = args[1].ToString() };
-						}
+                    {
+                        if (function == null)
+                        {
+                            function = context.Root.GetFunction("", (string)args[1], context.GetParameter(Parameters.Left) ? Directions.Left : Directions.Right); // Вызов пользовательской функции
+                            if (function == null)
+                                throw new FunctionDefinitionNotFoundException() { FunctionName = args[1].ToString() };
+                        }
 
-						var parameter = args[2];
-						object value = args[0];
+                        var parameter = args[2];
+                        object value = args[0];
 
-						if (parameter is IEnumerable enumerable1)
-						{
-							foreach (var item in enumerable1)
-							{
-								var list = new object[] { item, value };
-								value = function.TransformCoreAll(list, context.Runtime.CancellationToken);
-							}
-						}
-						else
-						{
-							var list = new object[] { parameter, value };
-							value = function.TransformCoreAll(list, context.Runtime.CancellationToken);
-						}
+                        if (parameter is IEnumerable enumerable1)
+                        {
+                            foreach (var item in enumerable1)
+                            {
+                                var list = new object[] { item, value };
+                                value = function.TransformCoreAll(list, context.Runtime.CancellationToken);
+                            }
+                        }
+                        else
+                        {
+                            var list = new object[] { parameter, value };
+                            value = function.TransformCoreAll(list, context.Runtime.CancellationToken);
+                        }
 
-						return value;
-					}
+                        return value;
+                    }
 
-				case "ifdef":
-					{
-						var parameter = args[0].ToString();
-						return context.Vars.ContainsKey(parameter);
-					};
+                case "ifdef":
+                    {
+                        var parameter = args[0].ToString();
+                        return context.Vars.ContainsKey(parameter);
+                    };
 
-				case "length":
+                case "length":
                     return ((IEnumerable)args[0]).Cast<object>().Count().ToString();
 
                 case "lower":
                     return args[0].ToString().ToLower();
 
-				case "stringify":
-					var argument = args[0];
+                case "stringify":
+                    var argument = args[0];
 
-					if (argument is IEnumerable enumerable)
-					{
-						var result = new StringBuilder();
+                    if (argument is IEnumerable enumerable)
+                    {
+                        var result = new StringBuilder();
 
-						foreach (var item in enumerable)
-						{
-							result.Append('{').Append(item).Append('}');
-						}
+                        foreach (var item in enumerable)
+                        {
+                            result.Append('{').Append(item).Append('}');
+                        }
 
-						return result.ToString();
-					}
+                        return result.ToString();
+                    }
 
-					return args[0].ToString();
+                    return args[0].ToString();
 
                 case "upper":
                     return args[0].ToString().ToUpper();

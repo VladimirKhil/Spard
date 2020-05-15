@@ -49,24 +49,24 @@ namespace Spard.Expressions
                 _index = 0;
 
                 var source = input.Read();
-				if (source is TupleValue tupleValue && tupleValue.Items.Length >= _operands.Length)
-				{
-					_sources = tupleValue.Items.Select(item => ValueConverter.ConvertToSource(ValueConverter.ConvertToEnumerable(item))).ToArray();
-				}
-				else
-				{
-					if (source is TupleSource tupleSource && tupleSource.Sources.Length == _operands.Length)
-					{
-						_sources = tupleSource.Sources;
-					}
-					else
-					{
-						input.Position--;
-						return false;
-					}
-				}
+                if (source is TupleValue tupleValue && tupleValue.Items.Length >= _operands.Length)
+                {
+                    _sources = tupleValue.Items.Select(item => ValueConverter.ConvertToSource(ValueConverter.ConvertToEnumerable(item))).ToArray();
+                }
+                else
+                {
+                    if (source is TupleSource tupleSource && tupleSource.Sources.Length == _operands.Length)
+                    {
+                        _sources = tupleSource.Sources;
+                    }
+                    else
+                    {
+                        input.Position--;
+                        return false;
+                    }
+                }
 
-				_initialPositions = _sources.Select(s => s.Position).ToArray();
+                _initialPositions = _sources.Select(s => s.Position).ToArray();
                 _matchedIndicies = Enumerable.Repeat(-1, _sources.Length).ToArray();
             }
             else

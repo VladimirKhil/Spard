@@ -21,10 +21,10 @@ namespace Spard.Data
 
         public override bool Equals(object obj)
         {
-			if (obj is EnumerableValue enumerableValue)
-				return object.Equals(Value, enumerableValue.Value);
+            if (obj is EnumerableValue enumerableValue)
+                return object.Equals(Value, enumerableValue.Value);
 
-			return base.Equals(obj);
+            return base.Equals(obj);
         }
 
         public override int GetHashCode()

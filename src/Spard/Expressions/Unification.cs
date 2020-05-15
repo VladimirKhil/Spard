@@ -48,10 +48,10 @@ namespace Spard.Expressions
         /// <returns>Was unification successfull</returns>
         internal bool Unify(IContext context)
         {
-			if (!BindingManager.Unify(_right, _left, context, context, out BindingFormula bindingFormula))
-				return false;
+            if (!BindingManager.Unify(_right, _left, context, context, out BindingFormula bindingFormula))
+                return false;
 
-			if (bindingFormula != null)
+            if (bindingFormula != null)
                 context.AddFormula(bindingFormula);
 
             return true;

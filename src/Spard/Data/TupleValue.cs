@@ -18,22 +18,22 @@ namespace Spard.Data
 
         public override string ToString()
         {
-			var result = new StringBuilder();
+            var result = new StringBuilder();
 
-			foreach (var item in Items)
-			{
-				if (result.Length > 0)
-					result.Append(' ');
+            foreach (var item in Items)
+            {
+                if (result.Length > 0)
+                    result.Append(' ');
 
-				if (item is TupleValue tupleValue)
-				{
-					result.Append('{').Append(item).Append('}');
-				}
-				else
-				{
-					result.Append(item);
-				}
-			}
+                if (item is TupleValue tupleValue)
+                {
+                    result.Append('{').Append(item).Append('}');
+                }
+                else
+                {
+                    result.Append(item);
+                }
+            }
 
             return result.ToString();
         }
