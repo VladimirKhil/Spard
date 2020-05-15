@@ -4,9 +4,9 @@ SPARD language is briefly described in repo Wiki: https://github.com/VladimirKhi
 
 The purpose of SPARD language is the transformation of objects sequences, primarily texts to texts. The language provides syntax capable of simple text transformations without excessive coding.
 
-Current SPARD implementation is done in C# language. It is built as a .NET Standard 2.0 library. SPARD interpreter is a .NET Core 2.2 console application.
+Current SPARD implementation is done in C# language. It is built as a .NET Standard 2.0 library. SPARD interpreter is a .NET Core 3.1 console application.
 
-You need Microsoft Visual Studio 2017 or higher to compile the source code.
+You need Microsoft Visual Studio 2019 or higher to compile the source code.
 
 Projects description:
 
