@@ -265,7 +265,7 @@ namespace Spard.Core
                             {
                                 var newItems = new object[items.Length + 1];
                                 Array.Copy(items, newItems, items.Length);
-								newItems[items.Length] = newValue.Value;
+                                newItems[items.Length] = newValue.Value;
 
                                 newVal = newItems;
                             }

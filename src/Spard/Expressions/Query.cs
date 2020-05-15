@@ -53,13 +53,13 @@ namespace Spard.Expressions
         {
             get
             {
-				if (_operand is StringValueMatch stringValueMatch)
-					return stringValueMatch.Value;
+                if (_operand is StringValueMatch stringValueMatch)
+                    return stringValueMatch.Value;
 
-				if (this._operand is TupleValueMatch tupleValueMatch && tupleValueMatch._operands.Length > 0)
-					return tupleValueMatch._operands[0].ToString();
+                if (this._operand is TupleValueMatch tupleValueMatch && tupleValueMatch._operands.Length > 0)
+                    return tupleValueMatch._operands[0].ToString();
 
-				return _operand.ToString();
+                return _operand.ToString();
             }
         }
 

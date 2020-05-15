@@ -100,8 +100,8 @@ namespace Spard.Common
                                 {
                                     if (workingContext.Vars.TryGetValue(collectVar, out val))
                                     {
-										var key = "_collect_" + collectVar;
-										List<object> capture;
+                                        var key = "_collect_" + collectVar;
+                                        List<object> capture;
                                         if (!workingContext.Vars.TryGetValue(key, out object collectVal))
                                             capture = new List<object>();
                                         else

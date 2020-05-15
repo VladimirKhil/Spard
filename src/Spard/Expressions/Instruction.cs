@@ -74,30 +74,30 @@ namespace Spard.Expressions
                     Argument = opArray[1];
             }
 
-			if (_operand is StringValueMatch sv)
-			{
-				if (Modifiers.ContainsKey(sv.Value))
-				{
-					_operand = new TupleValueMatch(new StringValueMatch("on"), _operand);
-				}
-			}
-			else
-			{
-				if (_operand is TupleValueMatch list)
-				{
-					if (Modifiers.ContainsKey(list._operands[0].ToString()))
-					{
+            if (_operand is StringValueMatch sv)
+            {
+                if (Modifiers.ContainsKey(sv.Value))
+                {
+                    _operand = new TupleValueMatch(new StringValueMatch("on"), _operand);
+                }
+            }
+            else
+            {
+                if (_operand is TupleValueMatch list)
+                {
+                    if (Modifiers.ContainsKey(list._operands[0].ToString()))
+                    {
                         var ops = new List<Expression>(0)
                         {
                             new StringValueMatch("on")
                         };
                         ops.AddRange(list._operands);
 
-						_operand = new TupleValueMatch(ops.ToArray());
-					}
-				}
-			}
-		}
+                        _operand = new TupleValueMatch(ops.ToArray());
+                    }
+                }
+            }
+        }
 
         public Instruction()
         {
@@ -147,26 +147,26 @@ namespace Spard.Expressions
 
             var initStart = input.Position;
 
-			if (_operand is Unification unification)
-			{
-				if (next)
-					return false;
+            if (_operand is Unification unification)
+            {
+                if (next)
+                    return false;
 
-				return unification.Unify(context);
-			}
+                return unification.Unify(context);
+            }
 
-			if (_operand is FunctionCall functionCall)
-			{
-				if (next)
-					return false;
+            if (_operand is FunctionCall functionCall)
+            {
+                if (next)
+                    return false;
 
-				var result = functionCall.Apply(context);
+                var result = functionCall.Apply(context);
 
-				if (result is bool b)
-					return b;
+                if (result is bool b)
+                    return b;
 
-				return true;
-			}
+                return true;
+            }
 
             var expressionList = _operand as TupleValueMatch;
             Expression[] arguments;
@@ -195,8 +195,8 @@ namespace Spard.Expressions
                         if (parameter != null)
                             parameter.Free(workingContext);
 
-						var name = ((Query)arguments[1]).Name;
-						if (workingContext.Vars.TryGetValue(name, out object cVal))
+                        var name = ((Query)arguments[1]).Name;
+                        if (workingContext.Vars.TryGetValue(name, out object cVal))
                             return cVal.Equals(val);
 
                         workingContext.Vars[name] = val;
@@ -221,9 +221,9 @@ namespace Spard.Expressions
                         if (arguments.Length == 1)
                             break;
 
-						Modifiers.TryGetValue(arguments[1].ToString(), out Parameters parameter);
+                        Modifiers.TryGetValue(arguments[1].ToString(), out Parameters parameter);
 
-						var param = context.UseParameter(parameter, arguments[0].ToString() == "on");
+                        var param = context.UseParameter(parameter, arguments[0].ToString() == "on");
 
                         IContext origin = null;
                         if (arguments[0].ToString() == "on" && arguments.Length > 2)
@@ -232,8 +232,8 @@ namespace Spard.Expressions
                             context = context.Clone();
 
                             var argKey = "arg_" + parameter;
-							var list = new List<string>();
-							if (context.Vars.TryGetValue(argKey, out object val))
+                            var list = new List<string>();
+                            if (context.Vars.TryGetValue(argKey, out object val))
                             {
                                 var value = (List<string>)val;
                                 var originList = value as List<string>;

@@ -537,38 +537,38 @@ namespace Spard
                 var funcName = function.Left as StringValueMatch;
                 var functionName = funcName.Value;
 
-				if (BuiltInFunctions.Contains(functionName))
-					throw new Exception($"Function \"{functionName}\" cannot be defined because this name is reserved!");
+                if (BuiltInFunctions.Contains(functionName))
+                    throw new Exception($"Function \"{functionName}\" cannot be defined because this name is reserved!");
 
-				if (!resultOfFunctionDefinitions.TryGetValue(functionName, out List<Function> branches))
-				{
-					branches = new List<Function>();
-					resultOfFunctionDefinitions[functionName] = branches;
-				}
+                if (!resultOfFunctionDefinitions.TryGetValue(functionName, out List<Function> branches))
+                {
+                    branches = new List<Function>();
+                    resultOfFunctionDefinitions[functionName] = branches;
+                }
 
-				if (function.Right is ComplexValueMatch complexValue)
-				{
-					if (complexValue.Operand is Block block)
-					{
-						foreach (var subFunction in block._operands.OfType<Function>())
-						{
-							branches.Add(subFunction);
-						}
-					}
+                if (function.Right is ComplexValueMatch complexValue)
+                {
+                    if (complexValue.Operand is Block block)
+                    {
+                        foreach (var subFunction in block._operands.OfType<Function>())
+                        {
+                            branches.Add(subFunction);
+                        }
+                    }
 
-					if (complexValue.Operand is TupleValueMatch tupleValue)
-					{
-						foreach (var subFunction in tupleValue._operands.OfType<Function>())
-						{
-							branches.Add(subFunction);
-						}
-					}
-				}
-				else
-				{
-					branches.Add((Function)function.Right);
-				}
-			}
+                    if (complexValue.Operand is TupleValueMatch tupleValue)
+                    {
+                        foreach (var subFunction in tupleValue._operands.OfType<Function>())
+                        {
+                            branches.Add(subFunction);
+                        }
+                    }
+                }
+                else
+                {
+                    branches.Add((Function)function.Right);
+                }
+            }
 
             return resultOfFunctionDefinitions;
         }
@@ -583,21 +583,21 @@ namespace Spard
             {
                 foreach (var expr in builder.Parse())
                 {
-					if (expr is Definition def)
-					{
-						if (def.Left is Set)
-							setDefinitions.Add(def);
-						else if (def.Left is StringValueMatch && (def.Right is Function || def.Right is Block))
-							functionDefinitions.Add(def);
+                    if (expr is Definition def)
+                    {
+                        if (def.Left is Set)
+                            setDefinitions.Add(def);
+                        else if (def.Left is StringValueMatch && (def.Right is Function || def.Right is Block))
+                            functionDefinitions.Add(def);
 
-						continue;
-					}
+                        continue;
+                    }
 
-					if (expr is Instruction instr)
-					{
-						instructions.Add(instr);
-					}
-				}
+                    if (expr is Instruction instr)
+                    {
+                        instructions.Add(instr);
+                    }
+                }
             }
 
             _functions = Array.Empty<Function>();
@@ -687,24 +687,24 @@ namespace Spard
         {
             var source = ValueConverter.ConvertToSource(input);
 
-			var runtime = new RuntimeInfo(root, cancellationToken)
-			{
-				SearchBestVariant = SearchBestVariant
-			};
+            var runtime = new RuntimeInfo(root, cancellationToken)
+            {
+                SearchBestVariant = SearchBestVariant
+            };
 
-			return TransformInternal(source, runtime);
+            return TransformInternal(source, runtime);
         }
 
         public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default)
         {
             var source = ValueConverter.ConvertToSource(input);
 
-			var runtime = new RuntimeInfo(root, cancellationToken)
-			{
-				SearchBestVariant = SearchBestVariant
-			};
+            var runtime = new RuntimeInfo(root, cancellationToken)
+            {
+                SearchBestVariant = SearchBestVariant
+            };
 
-			return StepTransformInternal(source, runtime);
+            return StepTransformInternal(source, runtime);
         }
 
         #region Transform
@@ -769,10 +769,10 @@ namespace Spard
         private IEnumerable TransformEmpty(CancellationToken cancellationToken)
         {
             var source = new ObjectSource(Enumerable.Empty<object>());
-			var runtime = new RuntimeInfo(root, cancellationToken)
-			{
-				SearchBestVariant = SearchBestVariant
-			};
+            var runtime = new RuntimeInfo(root, cancellationToken)
+            {
+                SearchBestVariant = SearchBestVariant
+            };
 
             for (var i = 0; i < _functions.Length; i++)
             {

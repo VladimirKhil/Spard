@@ -12,26 +12,26 @@ namespace Spard.Common
     {
         internal static BigInteger ConvertToNumber(object value)
         {
-			if (value is string stringValue)
-				return BigInteger.Parse(stringValue);
+            if (value is string stringValue)
+                return BigInteger.Parse(stringValue);
 
-			if (value is IEnumerable<char> charEnumerable)
-				return BigInteger.Parse(new string(charEnumerable.ToArray()));
+            if (value is IEnumerable<char> charEnumerable)
+                return BigInteger.Parse(new string(charEnumerable.ToArray()));
 
-			if (value is IEnumerable<object> enumerable)
-			{
-				if (enumerable.Count() == 1)
-				{
-					var first = enumerable.First();
+            if (value is IEnumerable<object> enumerable)
+            {
+                if (enumerable.Count() == 1)
+                {
+                    var first = enumerable.First();
 
-					if (first is BigInteger)
-						return (BigInteger)first;
-				}
+                    if (first is BigInteger)
+                        return (BigInteger)first;
+                }
 
-				return BigInteger.Parse(new string(enumerable.Cast<char>().ToArray()));
-			}
+                return BigInteger.Parse(new string(enumerable.Cast<char>().ToArray()));
+            }
 
-			return BigInteger.Parse(value.ToString());
+            return BigInteger.Parse(value.ToString());
         }
 
         internal static string Escape(object value)
@@ -71,22 +71,22 @@ namespace Spard.Common
             if (value == BindingManager.NullValue)
                 return BindingManager.NullValue;
 
-			if (value is IEnumerable enumerable)
-			{
-				var result = Enumerable.Empty<object>();
-				foreach (var item in enumerable)
-				{
-					var res = ConvertToEnumerable(item);
-					if (res == BindingManager.NullValue)
-						return BindingManager.NullValue;
+            if (value is IEnumerable enumerable)
+            {
+                var result = Enumerable.Empty<object>();
+                foreach (var item in enumerable)
+                {
+                    var res = ConvertToEnumerable(item);
+                    if (res == BindingManager.NullValue)
+                        return BindingManager.NullValue;
 
-					result = result.Concat(res);
-				}
+                    result = result.Concat(res);
+                }
 
-				return result;
-			}
+                return result;
+            }
 
-			return new object[] { value };
+            return new object[] { value };
         }
 
         internal static object GetValue(this ISource source, int startIndex, int length)
@@ -104,60 +104,60 @@ namespace Spard.Common
 
         internal static object Evaluate(object value)
         {
-			if (value is IEnumerable enumerable)
-				return enumerable.Cast<object>().ToArray();
+            if (value is IEnumerable enumerable)
+                return enumerable.Cast<object>().ToArray();
 
-			return value;
+            return value;
         }
 
         internal static object ConvertToSingle(object value)
         {
-			if (value is IEnumerable enumerable && enumerable.Cast<object>().Count() == 1)
-				return enumerable.Cast<object>().FirstOrDefault();
+            if (value is IEnumerable enumerable && enumerable.Cast<object>().Count() == 1)
+                return enumerable.Cast<object>().FirstOrDefault();
 
-			return value;
+            return value;
         }
 
         internal static ISource ConvertToSource(IEnumerable source)
         {
-			if (source is string stringInput)
-				return new StringSource(stringInput);
+            if (source is string stringInput)
+                return new StringSource(stringInput);
 
-			return new BufferedSource(source);
+            return new BufferedSource(source);
         }
 
         internal static ISource ConvertToSource(object value)
         {
-			if (value is IEnumerable enumerable)
-				return ConvertToSource(enumerable);
+            if (value is IEnumerable enumerable)
+                return ConvertToSource(enumerable);
 
-			return new BufferedSource(new object[] { value });
+            return new BufferedSource(new object[] { value });
         }
 
-		internal static string ConvertToString(object value)
-		{
-			if (value is string s)
-				return s;
+        internal static string ConvertToString(object value)
+        {
+            if (value is string s)
+                return s;
 
-			if (value is object[] objArray)
-				return string.Join(",", objArray.Select(item => ValueConverter.Escape(item)));
+            if (value is object[] objArray)
+                return string.Join(",", objArray.Select(item => ValueConverter.Escape(item)));
 
-			if (value is IEnumerable<object> enumerable)
-			{
-				var result = new StringBuilder();
+            if (value is IEnumerable<object> enumerable)
+            {
+                var result = new StringBuilder();
 
-				foreach (var item in enumerable)
-				{
-					if (item is char c)
-						result.Append(c);
-					else
-						result.Append('{').Append(item).Append('}');
-				}
+                foreach (var item in enumerable)
+                {
+                    if (item is char c)
+                        result.Append(c);
+                    else
+                        result.Append('{').Append(item).Append('}');
+                }
 
-				return result.ToString();
-			}
+                return result.ToString();
+            }
 
-			return value.ToString();
-		}
+            return value.ToString();
+        }
     }
 }

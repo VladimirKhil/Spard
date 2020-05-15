@@ -803,14 +803,14 @@ namespace Spard.Expressions
         {
             BindingManager.PostUnify(_unificationContext, targetContext, sourceContext);
 
-			if (sourceContext.Vars.TryGetValue(Context.MatchKey, out object match))
-			{
-				var matchValue = new NamedValue { Name = Name, Value = match };
-				targetContext.AddMatch(matchValue, initStart);
-			}
-			else
-				SaveMatch(initStart, input, targetContext);
-		}
+            if (sourceContext.Vars.TryGetValue(Context.MatchKey, out object match))
+            {
+                var matchValue = new NamedValue { Name = Name, Value = match };
+                targetContext.AddMatch(matchValue, initStart);
+            }
+            else
+                SaveMatch(initStart, input, targetContext);
+        }
 
         private void SaveMatch(int initStart, ISource input, IContext context)
         {
