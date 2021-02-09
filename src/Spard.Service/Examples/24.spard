@@ -1,0 +1,19 @@
+; Spam/non spam classification
+
+; Counting the number of "bad" words
+<SpamWord> := предложени|выгод|скидк|ссылк|деньг
+<Spam $n>  := [lazy]<t><SpamWord><Spam $m>[$n = $m + 1]
+<Spam $n>  := <t>[$n = 0]
+
+; Counting the total number of words
+<Word>     := [line](.&!<SP>)+
+<Words $n> := (<SP>|<BR>)*<Word><Words $m>[$n = $m + 1]
+<Words $n> := (<SP>|<BR>)*<Word>(<SP>|<BR>)*[$n = 0]
+
+; The decision is made on the basis of the ratio of the total number of words and the number of "bad" words
+; Real systems are much more complex
+
+; [one] - cut (Prolog-style)
+
+([one]<Spam $n>&[one]<Words $w>)[line]%[$n * 25 > $w] => "SPAM"
+<t>                                                   => "NON SPAM"

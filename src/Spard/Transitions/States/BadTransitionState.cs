@@ -14,10 +14,7 @@ namespace Spard.Transitions
             BadLength = badLength;
         }
 
-        protected internal override bool IsFinal
-        {
-            get { return false; }
-        }
+        protected internal override bool IsFinal => false;
 
         protected internal override TransitionStateBase Move(object item, ref TransitionContext context, out IEnumerable result)
         {

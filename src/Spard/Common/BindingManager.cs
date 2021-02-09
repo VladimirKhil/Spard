@@ -14,9 +14,11 @@ namespace Spard.Common
         /// </summary>
         internal static object UnsetValue = new object();
         /// <summary>
-        /// Incorrect value
+        /// Incorrect value. This value must be unique so System.Array.Empty<object>() cannot be used.
         /// </summary>
-        internal static object[] NullValue = System.Array.Empty<object>();
+#pragma warning disable CA1825 // Avoid zero-length array allocations.
+        internal static object[] NullValue = new object[0];
+#pragma warning restore CA1825 // Avoid zero-length array allocations.
 
         internal static bool CompareValues(object leftValue, object rightValue)
         {

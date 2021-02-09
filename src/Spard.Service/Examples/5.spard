@@ -1,0 +1,9 @@
+; Double replacement
+; This functionality is possible only with the help of three replacements in text editors
+
+ab => ba
+ba => ab
+; ...
+; You can describe an arbitrary number of substitutions at a time
+
+$x => $x

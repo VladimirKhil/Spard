@@ -83,25 +83,12 @@ namespace Spard.Expressions
             if (context.Runtime != null && context.Runtime.CancellationToken.IsCancellationRequested)
                 return null;
 
-            var args = (TupleValue)this.Args.Apply(_initContext);
+            var args = (TupleValue)Args.Apply(_initContext);
             var argsArray = args.Items;
 
-            var res = this._name.Apply(_initContext).ToString();
-            //string module;
-            string name;
-            //if (res == null)
-            //{
-            //    var qualifiedName = (QualifiedName)argsArray[0];
-            //    module = qualifiedName.path[0];
-            //    name = qualifiedName.path[1];
-            //}
-            //else
-            {
-                //module = "";
-                name = res;
-            }
+            var res = _name.Apply(_initContext).ToString();
 
-            return Call(name, argsArray, _initContext, ref _function);
+            return Call(res, argsArray, _initContext, ref _function);
         }
 
         /// <summary>
@@ -304,12 +291,12 @@ namespace Spard.Expressions
             if (!(_operand is TupleValueMatch args))
             {
                 _name = _operand as StringValueMatch;
-                this.Args = new TupleValueMatch();
+                Args = new TupleValueMatch();
             }
             else
             {
                 _name = args._operands[0] as StringValueMatch;
-                this.Args = new TupleValueMatch(args._operands.Skip(1).ToArray());
+                Args = new TupleValueMatch(args._operands.Skip(1).ToArray());
             }
         }
     }

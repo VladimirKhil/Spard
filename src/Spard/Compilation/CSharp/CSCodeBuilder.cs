@@ -708,9 +708,9 @@ namespace Spard.Compilation.CSharp
                 return; // Let it be for now
 
             var normalState = (TransitionState)stateBase;
-            if (!normalState.table.TryGetValue(InputSet.EndOfSource, out TransitionLink link))
+            if (!normalState.Table.TryGetValue(InputSet.EndOfSource, out TransitionLink link))
             {
-                foreach (var pair in normalState.secondTable)
+                foreach (var pair in normalState.SecondTable)
                 {
                     if (!pair.Item1.Intersect(InputSet.IncludeEOS).IsEmpty)
                     {
@@ -752,7 +752,7 @@ namespace Spard.Compilation.CSharp
                 writer.WriteLine("result = null;");
             }
 
-            var allExceptEOF = normalState.table.Where(pair => !object.Equals(pair.Key, InputSet.EndOfSource)).ToArray();
+            var allExceptEOF = normalState.Table.Where(pair => !object.Equals(pair.Key, InputSet.EndOfSource)).ToArray();
             if (allExceptEOF.Length > 0)
             {
                 if (allExceptEOF.Length > 1)
@@ -810,9 +810,9 @@ namespace Spard.Compilation.CSharp
                 }
             }
 
-            if (!_switchMode && normalState.table.ContainsKey(InputSet.EndOfSource))
+            if (!_switchMode && normalState.Table.ContainsKey(InputSet.EndOfSource))
             {
-                var linkCode = WriteLink(list, i, normalState.table[InputSet.EndOfSource]);
+                var linkCode = WriteLink(list, i, normalState.Table[InputSet.EndOfSource]);
                 if (linkCode.Count > 0)
                 {
                     string mainText = "";
@@ -835,7 +835,7 @@ namespace Spard.Compilation.CSharp
                 }
             }
 
-            foreach (var item in normalState.secondTable)
+            foreach (var item in normalState.SecondTable)
             {
                 var usedKey = _switchMode ? item.Item1.Except(InputSet.IncludeEOS) : item.Item1;
                 exceptKey = exceptKey.Except(item.Item1);
@@ -1053,7 +1053,7 @@ namespace Spard.Compilation.CSharp
                 var exceptKey = new InputSet(InputSetType.Exclude);
 
                 var normalState = (TransitionState)stateBase;
-                foreach (var item in normalState.table)
+                foreach (var item in normalState.Table)
                 {
                     if (!IsLinkSimple(index, item.Value))
                     {
@@ -1073,7 +1073,7 @@ namespace Spard.Compilation.CSharp
                     exceptKey = exceptKey.Except(new InputSet(InputSetType.Include, item.Key));
                 }
 
-                foreach (var item in normalState.secondTable)
+                foreach (var item in normalState.SecondTable)
                 {
                     if (!IsLinkSimple(index, item.Item2))
                     {

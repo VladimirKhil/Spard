@@ -15,9 +15,6 @@ namespace Spard.Transitions
 
         }
 
-        public ModificationsList Clone()
-        {
-            return new ModificationsList(this);
-        }
+        public ModificationsList Clone() => new ModificationsList(this);
     }
 }

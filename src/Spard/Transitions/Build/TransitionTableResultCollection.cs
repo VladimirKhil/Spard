@@ -43,14 +43,11 @@ namespace Spard.Transitions
         /// <param name="expression"></param>
         /// <param name="isResult"></param>
         /// <returns></returns>
-        internal static TransitionTableResultCollection Create(Expression expression, bool isResult = false)
-        {
-            var collection = new TransitionTableResultCollection
+        internal static TransitionTableResultCollection Create(Expression expression, bool isResult = false) =>
+            new TransitionTableResultCollection
             {
                 new TransitionTableResult(expression, isResult)
             };
-            return collection;
-        }
 
         /// <summary>
         /// Create results collection from expressions set
@@ -65,10 +62,7 @@ namespace Spard.Transitions
             return collection;
         }
 
-        public override string ToString()
-        {
-            return string.Join(", ", this);
-        }
+        public override string ToString() => string.Join(", ", this);
 
         public override bool Equals(object obj)
         {
@@ -87,10 +81,6 @@ namespace Spard.Transitions
             }
 
             return hash;
-            //var hasResult = this.Last().IsResult;
-            //var max = hasResult ? this.Count - 1 : this.Count;
-
-            //return max.GetHashCode();
         }
 
         internal TransitionTableResultCollection CloneCollection()
@@ -106,22 +96,13 @@ namespace Spard.Transitions
 
         public bool Equals(TransitionTableResultCollection other)
         {
-            //var hasResult = this.Last().IsResult;
-            //var hasResultOther = other.Last().IsResult;
-            
-            var length = Count;// -1;//hasResult ? this.Count - 1 : this.Count;
-            //var maxOther = other.Count;// -1;//hasResultOther ? other.Count - 1 : other.Count;
+            var length = Count;
 
             if (length != other.Count)
                 return false;
 
             if (UsedVars.Length != other.UsedVars.Length)
                 return false;
-
-            //if (max == 0) // comparing two results
-            //{
-            //    return this[0].Equals(other[0]);
-            //}
 
             var varsMap = new Dictionary<string, string>();
             for (int i = 0; i < UsedVars.Length; i++)

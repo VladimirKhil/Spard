@@ -1,0 +1,13 @@
+; Syntax-directed translation
+; Convert the infix form of writing arithmetic expressions to prefix
+; Translation correspondences are specified as functions (<T>'+<E> = '+<T><E>) right inside the definitions of the sets
+
+[simplematch]
+
+<E> := (<T>'+<E> ~ '+<T><E>) | (<T>'-<E> ~ '-<T><E>) | (<T> ~ <T>)
+<T> := (<F>'*<T> ~ '*<F><T>) | (<F>'/<T> ~ '/<F><T>) | (<F> ~ <F>)
+<F> := (a ~ a) | ('(<E>') ~ <E>)
+
+[match][ignoresp]<E> => $(match E)
+
+<BR> => <BR>

@@ -6,9 +6,7 @@ namespace Spard.Transitions
 {
     internal sealed class TransitionSettings
     {
-        private readonly Dictionary<Expression, TransitionTable> transitionsCache = new Dictionary<Expression, TransitionTable>();
-
-        internal Dictionary<Expression, TransitionTable> TransitionsCache { get { return transitionsCache; } }
+        internal Dictionary<Expression, TransitionTable> TransitionsCache { get; } = new Dictionary<Expression, TransitionTable>();
 
         internal IExpressionRoot Root { get; private set; }
 

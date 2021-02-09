@@ -1,0 +1,14 @@
+; Easy autoreferencing: extracting every third sentence from the text
+
+<Sep> := '. | '! | '? | "..."
+; Sentence
+<Sent> := (.&!<Sep>)+<Sep>+
+
+<Sent>#2($l :: <Sent>) => @(normalize $l)
+<s><BR>*               => 
+
+normalize := {
+    <SP>*<BR><SP>* => <SP>
+    <SP>+          => <SP>
+    $x             => $x
+}

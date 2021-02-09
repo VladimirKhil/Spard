@@ -1,19 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Spard.Transitions
 {
     /// <summary>
-    /// Single input item test. Defines a set of acceptable items
+    /// Describes single input item test. Defines a set of acceptable items.
     /// </summary>
-    public sealed class InputSet: IEquatable<InputSet>
+    public sealed class InputSet : IEquatable<InputSet>
     {
         /// <summary>
-        /// Test with zero offset
+        /// Test with zero offset.
         /// </summary>
         public static InputSet Zero = new InputSet(InputSetType.Zero);
+
+        /// <summary>
+        /// End of source marker.
+        /// </summary>
+        internal static object EndOfSource = new object();
+
+        internal static InputSet IncludeEOS = new InputSet(InputSetType.Include, EndOfSource);
+
+        internal static InputSet ExcludeEOS = new InputSet(InputSetType.Exclude, EndOfSource);
 
         /// <summary>
         /// Test type
@@ -27,21 +35,12 @@ namespace Spard.Transitions
         /// <summary>
         /// Is allowed items set an empty set
         /// </summary>
-        public bool IsEmpty
-        {
-            get
-            {
-                return Type == InputSetType.Include && !Values.Any();
-            }
-        }
+        public bool IsEmpty => Type == InputSetType.Include && !Values.Any();
 
-        public bool IsFinishing
-        {
-            get
-            {
-                return Type == InputSetType.Include && Values.Count() == 1 && Values.First() == InputSet.EndOfSource;
-            }
-        }
+        /// <summary>
+        /// Does this test allow only the end of the input source?
+        /// </summary>
+        public bool IsFinishing => Type == InputSetType.Include && Values.Count() == 1 && Values.First() == EndOfSource;
 
         public InputSet(InputSetType type, params object[] values)
         {
@@ -55,90 +54,67 @@ namespace Spard.Transitions
             Values = values;
         }
 
-        /// <summary>
-        /// End of source marker
-        /// </summary>
-        internal static object EndOfSource = new object();
+        public override int GetHashCode() => Values.Count().GetHashCode();
 
-        internal static InputSet IncludeEOS = new InputSet(InputSetType.Include, new object[] { EndOfSource });
-        internal static InputSet ExcludeEOS = new InputSet(InputSetType.Exclude, new object[] { EndOfSource });
-
-        public override int GetHashCode()
-        {
-            return Values.Count().GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is InputSet other)
-                return Equals(other);
-
-            return base.Equals(obj);
-        }
+        public override bool Equals(object obj) => obj is InputSet other ? Equals(other) : base.Equals(obj);
 
         public bool Equals(InputSet other)
         {
             var length = Values.Count();
             if (Type != other.Type || length != other.Values.Count())
+            {
                 return false;
+            }
 
             foreach (var item in Values)
             {
                 if (!other.Values.Contains(item))
+                {
                     return false;
+                }
             }
 
             return true;
         }
 
-        public override string ToString()
-        {
-            if (Type == InputSetType.Zero)
-                return "0";
+        public override string ToString() =>
+            Type == InputSetType.Zero
+                ? "0"
+                : Values.Count() == 1
+                    ? PrintType() + Escape(Values.First())
+                    : $"{PrintType()}({string.Join("", Values.Select(Escape))})";
 
-            if (Values.Count() == 1)
-                return (Type == InputSetType.Include ? "+" : "-") + Escape(Values.First());
+        private string PrintType() => Type == InputSetType.Include ? "+" : "-";
 
-            return string.Format("{0}({1})",
-                Type == InputSetType.Include ? "+" : "-",
-                string.Join("", Values.Select(Escape))
-                );
-        }
-
-        public static string Escape(object value)
+        private static string Escape(object value)
         {
             if (value == EndOfSource)
                 return "\\0";
 
-            if (object.Equals(value, '\r'))
+            if (Equals(value, '\r'))
                 return "\\r";
 
-            if (object.Equals(value, '\n'))
+            if (Equals(value, '\n'))
                 return "\\n";
 
-            if (object.Equals(value, '\\'))
+            if (Equals(value, '\\'))
                 return "\\\\";
 
             return value.ToString();
         }
 
-        internal bool Contains(object item)
-        {
-            return Values.Contains(item) ^ Type == InputSetType.Exclude;
-        }
+        internal bool Contains(object item) => Values.Contains(item) ^ Type == InputSetType.Exclude;
 
         /// <summary>
         /// Split tow sets into common part and two unique parts
         /// </summary>
         /// <param name="other"></param>
         /// <returns>Returns A^B, A-B and B-A</returns>
-        internal Tuple<InputSet, InputSet, InputSet> IntersectAndTwoExcepts(InputSet other)
-        {
-            return Tuple.Create(
+        internal Tuple<InputSet, InputSet, InputSet> IntersectAndTwoExcepts(InputSet other) =>
+            Tuple.Create(
                 Intersect(other),
                 Except(other),
                 other.Except(this));
-        }
 
         /// <summary>
         /// Two sets intersection
@@ -262,7 +238,9 @@ namespace Spard.Transitions
                     i++;
                 }
                 else
+                {
                     result.Append(s[i]);
+                }
             }
 
             return result.ToString();

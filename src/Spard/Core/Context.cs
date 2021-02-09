@@ -186,7 +186,7 @@ namespace Spard.Core
             if (!(item is char))
                 return false;
 
-            return Char.IsWhiteSpace((char)(object)item) && !object.Equals(item, '\r') && !object.Equals(item, '\n'); 
+            return char.IsWhiteSpace((char)(object)item) && !Equals(item, '\r') && !Equals(item, '\n'); 
         }
 
         public object GetValue(string name)

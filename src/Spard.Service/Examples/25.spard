@@ -1,0 +1,62 @@
+; Convert C# Code to JavaScript Code
+; C# syntax is greatly simplified
+
+[suppressinline]
+
+<Digit> := 0-9
+<Letter> := a-z|A-Z|'_
+
+<NSModifier> := | public | internal
+<Modifier> := | public | private | protected | "protected internal"
+
+<Type> := void
+
+<Identifier>          := ($i :: <Letter>(<Letter>|<Digit>)*) ~ @(clear $i)
+
+<ID>                  := <Identifier>                        ~ <Identifier>
+<Member>              := <Identifier>                        ~ <Identifier>
+<QName>               := <ID>('.<Member>)*                   ~ @(simple <ID>)@(sep <Member>)
+
+<Arg>                 := ($s :: '"<s>'")                     ~ $s
+<ArgsList>            := <Arg>((',<ArgsList>                 ~ <Arg>',<ArgsList>) | `
+                               (                              ~ <Arg>))
+<ArgsList0>           := (                                   ~ ) | `
+                         (<ArgsList>                         ~ <ArgsList>)
+
+<StatementExpression> := <QName>"("<ArgsList0>")"            ~ @(simple <QName>)"("@(simple <ArgsList0>)")"
+<Statement>           := [one]<StatementExpression>";"       ~ @(simple <StatementExpression>)";"
+<Block>               := "{"<Statement>*"}"                  ~ <Statement>
+
+<FuncDef $s> := (static [madd s 1] | [madd s 0])<Type><Identifier>"()"<Block>
+
+<ItemDef> := <FuncDef $s>
+
+<ClassBody> := <ItemDef>*
+
+<Class> := <NSModifier>class<Identifier>"{"<ClassBody>"}"    ~ function' @(simple <Identifier>)"() { };"@(printstatic <Identifier> $(match ClassBody ItemDef FuncDef))
+
+; -----------------
+; Service functions
+; -----------------
+
+printstatic := ($c :: _) ($f :: (s:{1})) => <BR><BR>@(simple $c)".prototype."@(simple $(f Identifier))" = "function"() {"<BR>@(simple $(f Block))<BR>"};"
+
+clear := <SP>*($x :: _) => $x
+
+prepare := {
+    (<BR>|<SP>)+ => <SP>
+    $x           => $x
+}
+
+translate := {
+    [ignoresp]<Class> => @(simple $(match Class))
+    _                 => 0
+}
+
+sep := {$i :: _} => '.$i
+simple := {$x :: _} => $x
+
+; -----------------
+
+$t :: _ => [$t2 = @(prepare $t)]@(translate $t2)
+<t>     => 0

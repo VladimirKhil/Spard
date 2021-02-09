@@ -1,0 +1,10 @@
+; Simple calulator-2
+; The calculation of the expression is carried out as syntax-directed translation
+
+[simplematch]
+
+<E> := (<T>'+<E> ~ [$(match T) + $(match E)]) | (<E>'-<T> ~ [$(match E) - $(match T)]) | (<T> ~ <T>)
+<T> := (<F>'*<T> ~ [$(match F) * $(match T)]) | (<T>'/<F> ~ [$(match T) / $(match F)]) | (<F> ~ <F>)
+<F> := (<SP>*<Int> ~ $(match Int)) | ('(<E>') ~ <E>)
+
+[ignoresp][lrec]<E>[line]% => $(match E)

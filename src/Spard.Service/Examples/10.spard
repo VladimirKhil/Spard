@@ -1,0 +1,6 @@
+; grep - extraction the text lines containing the search string
+
+<Query> := "Петр"
+
+[line]($line :: <s><Query><s>)<BR>? => $line<BR>
+<s><BR>?                            =>

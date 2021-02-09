@@ -216,7 +216,7 @@ namespace Spard.Transitions
 
             var recordKey = record.Key;
             if (recordKey.Type == InputSetType.Include && recordKey.Values.Count() == 1)
-                workingState.table[recordKey.Values.First()] = link;
+                workingState.Table[recordKey.Values.First()] = link;
             // TODO: the underlying code is slower, although it breaks everything up in Dictionary
             // Most likely, it will be faster if you strongly fill _secondTable
             // This place should be left for additional research if the question of critical performance optimization arises
@@ -228,7 +228,7 @@ namespace Spard.Transitions
             //    }
             //}
             else
-                workingState.secondTable.Add(Tuple.Create(recordKey, link));
+                workingState.SecondTable.Add(Tuple.Create(recordKey, link));
 
             if (modification != null)
             {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Spard.Transitions
 {
@@ -16,7 +15,7 @@ namespace Spard.Transitions
         /// <summary>
         /// Actions that you need to perform when you go to the target state
         /// </summary>
-        public List<TransitionAction> Actions { get; private set; }
+        public List<TransitionAction> Actions { get; }
 
         internal TransitionLink(TransitionStateBase state)
         {

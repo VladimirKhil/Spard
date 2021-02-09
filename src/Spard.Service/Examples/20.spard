@@ -1,0 +1,28 @@
+; Sort lines in file
+
+[suppressinline]
+
+; File as sequence of strings
+<File> := <s>(<BR><s>)*
+
+[match]<File> => @(out @(sort $(match File s)))
+
+[$t :: _]
+
+out := {
+    {$t}% => $t
+    {$t}  => $t<BR>
+}
+
+; Sort in Prolog-style:
+; It consists in creating a result list and then inserting elements of the original list into the desired position in it
+sort := {
+    %    => 
+    $h$t => @(insert $h @(sort $t))
+}
+
+insert := {
+    $i       %             => $i
+    $i       $h[$i < $h]$t => $i$h$t
+    [cont]$i $h            => $h
+}

@@ -1,0 +1,33 @@
+; Simple calculator-3 (functional-style)
+; The expression is calculated by building a syntax tree and further calculating the result for it
+
+[simplematch]
+
+<E> := <T>[madd op '+]'+<E> | <E>[madd op '-]'-<T> | <T>
+<T> := <F>[madd op '*]'*<T> | <T>[madd op '/]'/<F> | <F>
+<F> := <SP>*<Int> | [madd op 1]'(<E>')
+
+[ignoresp][lrec][match]<E>[line]% => @(calc E $(match E))
+_ => NaN
+
+calc := {
+    E $e[$(e op) = '+] => [@(calc T $(e T)) + @(calc E $(e E))]
+    E $e[$(e op) = '-] => [@(calc E $(e E)) - @(calc T $(e T))]
+    E $e               => @(calc T $(e T))
+    T $t[$(t op) = '*] => [@(calc F $(t F)) * @(calc T $(t T))]
+    T $t[$(t op) = '/] => [@(calc T $(t T)) / @(calc F $(t F))]
+    T $t               => @(calc F $(t F))
+    F $f[$(f op) = 1]  => @(calc E $(f E))
+    F $f               => $(f Int)
+}
+
+; Could be so
+calc2 := {
+    E {op:'+ T:$t E:$e} => [@(calc2 T $t) + @(calc2 E $e)]
+    E {op:'- T:$t E:$e} => [@(calc2 E $e) - @(calc2 T $t)]
+    E {T:$t}            => @(calc2 T $t)
+    T {op:'* F:$f T:$t} => [@(calc2 F $f) * @(calc2 T $t)]
+    T {op:'/ F:$f T:$t} => [@(calc2 T $t) / @(calc2 F $f)]
+    T {F:$f}            => @(calc2 F $f)
+    F {Int:($v :: _)}   => $v
+}

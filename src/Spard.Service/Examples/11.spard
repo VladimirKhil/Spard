@@ -1,0 +1,140 @@
+; Number to Russian string representation converter
+
+; Digit (embedded predicate)
+; <d> := 0 - 9
+
+; Group of three digits
+<Group> := <d>#3
+
+; Incomplete (leading group)
+<Head> := <d>#1-3
+
+concat := ($a :: _) ($b :: _) => ($a)"|"$b ; | - is a bit delimiter, it is erased on output
+
+[$hh :: <Head>]
+[$g :: <Group>]
+
+<Groups $n $t> := $g<SP>*<Groups $m $u>[$n = $m + 1][$v = @(print $n $g)][$t = @(concat $v $u)]
+<Groups $n $t> := $g[$n = 0][$t = @(print $n $g)]
+
+<Headered $t> := $hh<SP>*<Groups $m $u>[$n = $m + 1][$v = @(print $n $hh)][$t = @(concat $v $u)]
+<Headered $t> := $hh[$t = @(print 0 $hh)]
+
+; Number
+<Number $t> := <Headered $t> | <Groups $k $t>
+
+[$dl :: ..]
+
+print := {
+    0 0+%      => 
+    0 0?$dl%   => @(str10 $dl)
+    0 (00)?$l% => @(str1 $l)
+    0 $h00%    => @(str100 $h)
+    0 $h$dl%   => @(str100 $h)' @(str10 $dl)
+
+    1 0+%           => 
+    1 ($n :: .*1.)% => @(print 0 $n)' тысяч
+    1 ($n :: .*)1%  => @(print 0 ($n)0)'|одна' тысяча
+    1 ($n :: .*)2%  => @(print 0 ($n)0)'|две' тысячи
+    1 ($n :: .*$l)  => @(print 0 $n)' @(convert $l тысяч)
+
+    2 $tt => @(printH $tt миллион)
+    3 $tt => @(printH $tt миллиард)
+}
+
+[$tt :: _]
+
+printH := {
+    0+%           $tt => 
+    ($n :: .*1.)% $tt => @(print 0 $n)' ($tt)ов
+    ($n :: .*$l)% $tt => @(print 0 $n)' @(convert $l $tt)
+}
+
+[$it :: .+ч]
+[$is :: .+]
+
+convert := {
+    1     $it => ($it)а
+    2|3|4 $it => ($it)и
+    .     $it => $it
+
+    1     $is => $is
+    2|3|4 $is => ($is)а
+    .     $is => ($is)ов
+}
+
+; Units
+
+str1 := {
+    1 => один
+    2 => два
+    3 => три
+    4 => четыре
+    5 => пять
+    6 => шесть
+    7 => семь
+    8 => восемь
+    9 => девять
+    0 => 
+}
+
+; Dozens
+
+str10 := {
+    $n :: 1. => @(str1120 $n)
+    0$m      => @(str1 $m)
+    ($n)0    => @(str10 $n)
+    $n$m     => @(str10 $n)' @(str1 $m)
+}
+
+str10 := {
+    2 => двадцать
+    3 => тридцать
+    4 => сорок
+    5 => пятьдесят
+    6 => шестьдесят
+    7 => семьдесят
+    8 => восемьдесят
+    9 => девяносто
+    0 => 
+}
+
+; Special numbers
+
+str1120 := {
+    10 => десять
+    11 => одиннадцать
+    12 => двенадцать
+    13 => тринадцать
+    14 => четырнадцать
+    15 => пятнадцать
+    16 => шестнадцать
+    17 => семнадцать
+    18 => восемнадцать
+    19 => девятнадцать
+}
+
+; Hundreds
+
+str100 := {
+    1 => сто
+    2 => двести
+    3 => триста
+    4 => четыреста
+    5 => пятьсот
+    6 => шестьсот
+    7 => семьсот
+    8 => восемьсот
+    9 => девятьсот
+    0 => 
+}
+
+<Number $t>[line]% => @(clean $t)
+
+clean := {
+    (^'|+) | ('|+%) =>
+    '|+             => " "
+    $t              => $t
+}
+
+<BR> => <BR>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.489
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard", "src\Spard\Spard.csproj", "{E366C1B5-2FD1-46DD-B164-46C1F33DA308}"
 EndProject
@@ -17,7 +17,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spard.Test", "test\Spard.Test\Spard.Test.csproj", "{2DFB6FF9-B352-48AB-A181-686084CBC6B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Test", "test\Spard.Test\Spard.Test.csproj", "{2DFB6FF9-B352-48AB-A181-686084CBC6B3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Service.Contract", "src\Spard.Service.Contract\Spard.Service.Contract.csproj", "{6AC6F33F-6C44-40E8-8C2A-A9E2EE406BF4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Service.Client", "src\Spard.Service.Client\Spard.Service.Client.csproj", "{330C9409-3FE9-403C-A9DD-CBEB298B755D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Service", "src\Spard.Service\Spard.Service.csproj", "{0E8C0DFD-28BE-4A12-9F1D-6C3370C51C20}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Service.IntegrationTest", "test\Spard.Service.IntegrationTest\Spard.Service.IntegrationTest.csproj", "{639EA471-2EB8-484E-8D2D-7A042CC74191}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +45,22 @@ Global
 		{2DFB6FF9-B352-48AB-A181-686084CBC6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DFB6FF9-B352-48AB-A181-686084CBC6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DFB6FF9-B352-48AB-A181-686084CBC6B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AC6F33F-6C44-40E8-8C2A-A9E2EE406BF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AC6F33F-6C44-40E8-8C2A-A9E2EE406BF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AC6F33F-6C44-40E8-8C2A-A9E2EE406BF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AC6F33F-6C44-40E8-8C2A-A9E2EE406BF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{330C9409-3FE9-403C-A9DD-CBEB298B755D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{330C9409-3FE9-403C-A9DD-CBEB298B755D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{330C9409-3FE9-403C-A9DD-CBEB298B755D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{330C9409-3FE9-403C-A9DD-CBEB298B755D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E8C0DFD-28BE-4A12-9F1D-6C3370C51C20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E8C0DFD-28BE-4A12-9F1D-6C3370C51C20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E8C0DFD-28BE-4A12-9F1D-6C3370C51C20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E8C0DFD-28BE-4A12-9F1D-6C3370C51C20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{639EA471-2EB8-484E-8D2D-7A042CC74191}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{639EA471-2EB8-484E-8D2D-7A042CC74191}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{639EA471-2EB8-484E-8D2D-7A042CC74191}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{639EA471-2EB8-484E-8D2D-7A042CC74191}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -45,6 +69,10 @@ Global
 		{E366C1B5-2FD1-46DD-B164-46C1F33DA308} = {DCE6748E-E50C-4CF0-BD4C-4FC54E538FAF}
 		{96D8FC05-6099-47EB-9D0B-F636D19F0565} = {DCE6748E-E50C-4CF0-BD4C-4FC54E538FAF}
 		{2DFB6FF9-B352-48AB-A181-686084CBC6B3} = {169FB6A2-4044-495E-BF4A-2FCD9FDE24E5}
+		{6AC6F33F-6C44-40E8-8C2A-A9E2EE406BF4} = {DCE6748E-E50C-4CF0-BD4C-4FC54E538FAF}
+		{330C9409-3FE9-403C-A9DD-CBEB298B755D} = {DCE6748E-E50C-4CF0-BD4C-4FC54E538FAF}
+		{0E8C0DFD-28BE-4A12-9F1D-6C3370C51C20} = {DCE6748E-E50C-4CF0-BD4C-4FC54E538FAF}
+		{639EA471-2EB8-484E-8D2D-7A042CC74191} = {169FB6A2-4044-495E-BF4A-2FCD9FDE24E5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {29B650D0-64FB-4159-9EC0-1A19E8398C9C}

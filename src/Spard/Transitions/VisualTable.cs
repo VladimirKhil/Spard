@@ -4,7 +4,7 @@ using System.Text;
 namespace Spard.Transitions
 {
     /// <summary>
-    /// State transition table suitable for visual presentation
+    /// Defines state transition table suitable for visual presentation.
     /// </summary>
     internal sealed class VisualTable
     {
@@ -20,9 +20,8 @@ namespace Spard.Transitions
         }
 
         /// <summary>
-        /// Build simple visual table
+        /// Builds simple visual table.
         /// </summary>
-        /// <returns></returns>
         public string[,] ToSimpleTable()
         {
             var width = ColumnHeaders.Length + 1;
@@ -46,9 +45,9 @@ namespace Spard.Transitions
                 result[j, 0] = value.ToString();
             }
 
-            for (int j = 1; j < height; j++)
+            for (var j = 1; j < height; j++)
             {
-                for (int i = 1; i < width; i++)
+                for (var i = 1; i < width; i++)
                 {
                     var link = Data[j - 1, i - 1];
                     if (link != null)
@@ -58,21 +57,27 @@ namespace Spard.Transitions
                         if (link.Actions.Count > 0)
                         {
                             value.Append(" (");
-                            var first = true;
+                            var isFirst = true;
                             foreach (var action in link.Actions)
                             {
-                                if (!first)
+                                if (!isFirst)
+                                {
                                     value.Append(", ");
+                                }
 
                                 if (action is InsertResultAction insertAction)
+                                {
                                     value.Append(':').Append(insertAction.RemoveLastCount).Append(':').Append(insertAction.Result);
+                                }
                                 else
                                 {
                                     if (action is ReturnResultAction returnAction)
-                                        value.Append("r").Append(returnAction.LeftResultsCount);
+                                    {
+                                        value.Append('r').Append(returnAction.LeftResultsCount);
+                                    }
                                 }
 
-                                first = false;
+                                isFirst = false;
                             }
 
                             value.Append(')');

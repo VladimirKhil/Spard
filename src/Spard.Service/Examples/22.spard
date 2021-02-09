@@ -1,0 +1,41 @@
+; Standardization of Russian text in accordance with the rules
+; The text is in accordance with the design rules for sending to some recipient
+
+; Extra spaces removing
+<SP>+ => " "
+
+; Extra line breaks removing
+(<BR><SP>?)+ => <BR>
+
+; Appending period to every line except URL (removing period for them)
+addPoint := {
+    ($x :: .*"http://".*|.*www.*)('.|',|';)% => $x
+    ($x :: .*"http://".*|.*www.*)            => $x
+    $p($x :: .*)($sign :: '.|'?|'!)<SP>*%      => @(upper $p)$x$sign
+    $p($x :: .*)<SP>*%                       => @(upper $p)($x)'.
+    $p :: _                                  => $p
+}
+
+[$t :: <s>]
+
+; Disclosure of professional cuts
+"Ист."                          => Источник
+"Комм."<SP>$t                   => "Комментарий: "@(addPoint $t)
+"Комментари"(и|й)(':|'.)?<SP>$t => "Комментарий: "@(addPoint $t)
+
+[ignoresp]"т.е." => "то есть"
+
+"Н. Новгород" => "Нижний Новгород"
+
+; Standardization of titles
+Вопросы?(':|'.)?<SP>?<s> => "Вопрос:"
+Авторы?(':|'.)?<SP>?     => "Авторы: "
+Авторы?(':|'.)?<SP>?     => "Авторы: "
+Ответы?(':|'.)?<SP>?$t   => "Ответ: "@(addPoint $t)
+
+; Error correction
+"ложить"       => "класть"
+"впоследствие" => "впоследствии"
+"атрОги"       => "отрОги"
+
+$x => $x

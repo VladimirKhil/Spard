@@ -8,7 +8,7 @@ namespace Spard.Common
     /// </summary>
     public sealed class Variant
     {
-        public IEnumerable<object> Variants { get; } = null;
+        public IEnumerable<object> Variants { get; }
 
         internal Variant(IEnumerable<object> variants)
         {

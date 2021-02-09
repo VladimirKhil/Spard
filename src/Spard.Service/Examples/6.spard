@@ -1,0 +1,10 @@
+; Factorial
+
+; Actual transformation
+$n :: <d>+ => @(Fact $n)
+
+; Function definition
+Fact := {
+	0       => 1
+	$n :: _ => [$n * @(Fact ($n - 1))]
+}

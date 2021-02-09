@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using Spard.Common;
-using Spard.Core;
+﻿using Spard.Core;
+using System.Collections.Generic;
 
 namespace Spard.Transitions
 {

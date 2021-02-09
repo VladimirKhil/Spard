@@ -16,13 +16,13 @@ using System.Threading;
 namespace Spard
 {
     /// <summary>
-    /// Table transformer. It is an optimized version of transformer based on transformation trees.
+    /// Describes Table transformer. It is an optimized version of transformer based on transformation trees.
     /// Unlike the latter, it performs the transformation without recursive calls and back moves (in one pass of the input text).
     /// The transformer works in a mode similar to the Turing machine: the result of the conversion is determined by the current state of the transformer
     /// and the current input value. The correspondences between these parameters are stored in the table - hence the name of the transformer.
-    /// Worker classes are located in Transitions/States
-    /// Transitions ar described by graph in TransitionStateBase (using various subclasses)
-    /// Initial state is _initialState
+    /// Worker classes are located in Transitions/States folders.
+    /// Transitions are described by graph in <see cref="TransitionStateBase"/> (using various subclasses).
+    /// The initial state is <see cref="_initialState"/> .
     /// </summary>
     public sealed class TableTransformer : Transformer, ITransformFunction
     {
@@ -74,11 +74,11 @@ namespace Spard
                     state = state.Move(InputSet.EndOfSource, ref context, out result); // Need to push the tail of the result
                 }
 
-                if (state == null) // Tranformation error
+                if (state == null) // Transformation error
                 {
                     // Produce what has accumulated
                     // NB: only the highest chain of results is always saved
-                    // She presses under all the rest
+                    // It presses under all the rest
                     foreach (var res in context.Results)
                     {
                         foreach (var item in res.Data)
@@ -87,7 +87,7 @@ namespace Spard
                         }
                     }
 
-                    // Is always works in function mode, additional modes were taken into account when creating the transformer
+                    // It always works in the function mode, additional modes has been taken into account when creating the transformer
 
                     Error = true;
                     yield break;
@@ -116,20 +116,16 @@ namespace Spard
             } while (isNotFinal);
         }
 
-        public override Transformer ChainWith(Transformer transformer)
-        {
-            throw new NotImplementedException();
-        }
+        public override Transformer ChainWith(Transformer transformer) => throw new NotImplementedException();
 
-        public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input, CancellationToken cancellationToken = default)
-        {
+        public override IEnumerable<IEnumerable<object>> StepTransform(IEnumerable input,
+            CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
-        }
 
         /// <summary>
-        /// Visualize table transformer. Builds a table of states and transitions between them
+        /// Visualizes the table transformer. Builds a table of states and transitions between them.
         /// </summary>
-        /// <returns>Transformer visualization</returns>
+        /// <returns>Transformer visualization.</returns>
         public string[,] Visualize()
         {
             var visualTable = _initialState.BuildVisualTable();
@@ -156,9 +152,9 @@ namespace Spard
         }
 
         /// <summary>
-        /// Generate source code of the transformer
+        /// Generates source code of the transformer.
         /// </summary>
-        /// <returns>C# source code that performs the transformation</returns>
+        /// <returns>C# source code that performs the transformation.</returns>
         public void GenerateSourceCode(TextWriter writer)
         {
             var wr = new IndentWriter(writer);
@@ -171,10 +167,7 @@ namespace Spard
             _initialState.Save(stream);
         }
 
-        public static TableTransformer Load(System.IO.Stream stream)
-        {
-            return new TableTransformer(Transitions.TransitionStateBase.Load(stream));
-        }
+        public static TableTransformer Load(Stream stream) => new TableTransformer(TransitionStateBase.Load(stream));
 
         IEnumerable ITransformFunction.TransformCoreAll(object[] args, CancellationToken cancellationToken)
         {
@@ -200,23 +193,11 @@ namespace Spard
             else
             {
                 throw new NotImplementedException();
-                //var source = new TupleSource
-                //{
-                //    Sources = args.Select(item => ValueConverter.ConvertToSource(ValueConverter.ConvertToEnumerable(item))).ToArray()
-                //};
-
-                //var runtime = new RuntimeInfo(this.root, cancellationToken);
-                //runtime.SearchBestVariant = this.SearchBestVariant;
-
-                //result = Transform(source);
             }
 
             return result;
         }
 
-        private IEnumerable TransformEmpty()
-        {
-            throw new NotImplementedException();
-        }
+        private IEnumerable TransformEmpty() => throw new NotImplementedException();
     }
 }

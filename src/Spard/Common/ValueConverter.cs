@@ -110,29 +110,16 @@ namespace Spard.Common
             return value;
         }
 
-        internal static object ConvertToSingle(object value)
-        {
-            if (value is IEnumerable enumerable && enumerable.Cast<object>().Count() == 1)
-                return enumerable.Cast<object>().FirstOrDefault();
+        internal static object ConvertToSingle(object value) =>
+            value is IEnumerable enumerable && enumerable.Cast<object>().Count() == 1
+                ? enumerable.Cast<object>().FirstOrDefault()
+                : value;
 
-            return value;
-        }
+        internal static ISource ConvertToSource(IEnumerable source) =>
+            source is string stringInput ? new StringSource(stringInput) : (ISource)new BufferedSource(source);
 
-        internal static ISource ConvertToSource(IEnumerable source)
-        {
-            if (source is string stringInput)
-                return new StringSource(stringInput);
-
-            return new BufferedSource(source);
-        }
-
-        internal static ISource ConvertToSource(object value)
-        {
-            if (value is IEnumerable enumerable)
-                return ConvertToSource(enumerable);
-
-            return new BufferedSource(new object[] { value });
-        }
+        internal static ISource ConvertToSource(object value) =>
+            value is IEnumerable enumerable ? ConvertToSource(enumerable) : new BufferedSource(new object[] { value });
 
         internal static string ConvertToString(object value)
         {

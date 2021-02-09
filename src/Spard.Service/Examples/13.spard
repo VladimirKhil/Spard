@@ -1,0 +1,9 @@
+; Check if the entered string belongs to the specified context-free grammar
+
+<S> := a<S>b | <F>
+<F> := c<F> | d
+
+<S> => 1
+<s> => 0
+
+<BR> => <BR>

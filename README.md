@@ -15,3 +15,8 @@ Projects description:
 * *test\Spard.Test*: SPARD implementation test which also provides a set of helpful SPARD examples
 
 You can test working SPARD examples and language interpreter here: http://vladimirkhil.com/lingware/spard/implementation?culture=en-US
+
+You can deploy standalone SPARD service in Docker and test it with .NET Core Spard client.
+
+Spard service Docker: https://hub.docker.com/repository/docker/vladimirkhil/spard
+Spard service client NuGet package: https://www.nuget.org/packages/Spard.Service.Client

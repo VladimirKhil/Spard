@@ -1,0 +1,56 @@
+; XML document to HTML conversion
+; This transformation resembles XSLT-transformation
+
+[suppressinline]
+
+; Common part describing abstract XML
+
+<Name> := (a-z|A-Z)+
+
+<Attr $n $v> := ($n :: <Name>)'='"($v :: <s>)'"
+
+<AName $name> := ($name :: <Name>)(<SP>+<Attr $n $v>)*
+
+<ElementOTag $name>  := "<"<AName $name>'>
+<ElementCTag $name>  := "</"($name :: <Name>)'>
+<ElementOCTag $name> := "<"<AName $name>"/>"
+<Element $name>      := (<ElementOTag $name><Body><ElementCTag $name>) | <ElementOCTag $name>
+
+<Body> := <Node>*
+
+<Node> := <Element $n> | <Comment> | <Instruction $i> | <BR> | <Int>
+
+<Comment> := "<!--"<s>"-->"
+
+<Instruction $i> := "<?"($i :: <s>)"?>"
+
+<Xml> := <Instruction "xml version='"1.0'""><BR><Element $r>
+
+; The specific part that describes the direct conversion
+
+[ignoresp][match]<Xml>% => @(transform $(match Xml))
+
+transform := {
+    $n[@(name $n) = {studies}] => "<html><head><title>Grades list</title></head><body><h1>Grades list</h1><table>"@(apply'-transforms $n)"</table></body></html>"
+    $n[@(name $n) = {student}] => "<tr><td>"@(simple $(n ElementOTag AName Attr s))"</td>"@(apply'-transforms $n)"</tr>"
+    $n[@(name $n) = {mark}]    => "<td>"@(simple $(n Body Node Int))"</td>"
+    $n                         => @(apply'-transforms $n)
+}
+
+apply'-transforms := $t => @(transform @(children $t))
+
+[$t :: _]
+
+children := {
+    { Body:$t }    => $(t Node Element)
+    { Element:$t } => $t
+    $t             =>
+}
+
+name := {
+    { ElementOTag:$t }  => $(t AName Name)
+    { ElementOCTag:$t } => $(t AName Name)
+    $t                  =>
+}
+
+simple := {$t} => $t

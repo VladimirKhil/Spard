@@ -1,0 +1,4 @@
+; Regular expressions: E-mail addresses extraction
+
+$email :: ((a-z)+"@"(a-z)+"."(a-z)#2-3) => "mail: "$email<BR>
+.                                       =>

@@ -1,0 +1,11 @@
+; Text validation for compliance with specified rules
+
+; Each sentence must begin with a capital letter and end with a corresponding punctuation mark
+
+<Sep>   := '. | '! | '? | "..."
+<First> := '"? (A-Z | А-Я)
+<Sent>  := <SP>*<First>(.&!<Sep>)*<Sep>+'"?
+<Good>  := <Sent>+%
+
+<Good> => "The text conforms to the standard"
+_      => "The text does not conforms to the standard"

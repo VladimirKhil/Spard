@@ -1,0 +1,27 @@
+; Word translation
+
+vocabulary => словарь
+sentences? => предложение
+people => люди
+terms? => понятие
+phrases? => фраза
+
+This => это
+
+English => английский
+Basic => базовый
+shorter => короткий
+complex => сложный
+
+normally => обычно
+
+Use => использовать
+allows? => позволять
+understand => понимать
+
+and => и
+or => или
+
+to =>
+
+$x => $x

@@ -10,7 +10,7 @@ using Spard.Core;
 namespace Spard.Transitions
 {
     /// <summary>
-    /// Base class for normal and final transform states
+    /// Defines base class for normal and final transform states.
     /// </summary>
     internal abstract class TransitionStateBase
     {
@@ -18,43 +18,41 @@ namespace Spard.Transitions
         private static int Index = 0;
         public int _index = Index++;
 
-        public override string ToString()
-        {
-            return _index.ToString();
-        }
+        public override string ToString() => _index.ToString();
 #endif
 
         /// <summary>
-        /// Is it a final state
+        /// Is it a final state.
         /// </summary>
         protected internal abstract bool IsFinal { get; }
 
         /// <summary>
-        /// Intermediate result insertion index (state asterisk)
+        /// Intermediate result insertion index (state asterisk).
         /// -2: the state does not have intermediate result
-        /// -1: intermedia result of high priority (it is returned immediately)
-        /// 0 or highter: insertion index
+        /// -1: intermediate result of high priority (it is returned immediately)
+        /// 0 or highter: insertion index.
         /// </summary>
         protected internal int IntermediateResultIndex { get; set; } = -2;
 
         /// <summary>
-        /// Go to next state based on input item
+        /// Goes to next state based on input item.
         /// </summary>
-        /// <param name="item">Input item</param>
-        /// <param name="context">Transformation context (transformation dynamics; allows you to accumulate the necessary information about previously viewed items)</param>
-        /// <returns>Next state or null if the transition is not possible (transformation fail)</returns>
+        /// <param name="item">Input item.</param>
+        /// <param name="context">
+        /// Transformation context (transformation dynamics;
+        /// allows you to accumulate the necessary information about previously viewed items).
+        /// </param>
+        /// <returns>Next state or null if the transition is not possible (transformation fails).</returns>
         protected internal abstract TransitionStateBase Move(object item, ref TransitionContext context, out IEnumerable result);
 
         /// <summary>
-        /// Get transformation result
+        /// Gets transformation result.
         /// </summary>
-        /// <returns></returns>
         protected internal abstract IEnumerable GetResult(TransitionContext context);
 
         /// <summary>
-        /// Build the transition description as a table
+        /// Builds the transition description as a table.
         /// </summary>
-        /// <returns></returns>
         internal VisualTable BuildVisualTable()
         {
             var columns = new List<InputSet>();
@@ -77,7 +75,7 @@ namespace Spard.Transitions
                     continue;
 
                 var state = stateBase as TransitionState;
-                foreach (var cell in state.table)
+                foreach (var cell in state.Table)
                 {
                     var test = new InputSet(InputSetType.Include, cell.Key);
                     if (!columns.Contains(test))
@@ -87,7 +85,7 @@ namespace Spard.Transitions
                     active.Enqueue(cell.Value.State);
                 }
 
-                foreach (var cell in state.secondTable)
+                foreach (var cell in state.SecondTable)
                 {
                     if (!columns.Contains(cell.Item1))
                         columns.Add(cell.Item1);
@@ -148,12 +146,12 @@ namespace Spard.Transitions
                     }
 
                     var state = (TransitionState)stateBase;
-                    foreach (var cell in state.table)
+                    foreach (var cell in state.Table)
                     {
                         Save(list, active, writer, new InputSet(InputSetType.Include, cell.Key), cell.Value);
                     }
 
-                    foreach (var cell in state.secondTable)
+                    foreach (var cell in state.SecondTable)
                     {
                         Save(list, active, writer, cell.Item1, cell.Item2);
                     }
@@ -309,7 +307,7 @@ namespace Spard.Transitions
                                 }
                                 else
                                 {
-                                    ((TransitionState)state).table[value] = new TransitionLink(states[nextState], actions);
+                                    ((TransitionState)state).Table[value] = new TransitionLink(states[nextState], actions);
                                 }
                             }
                             else
@@ -336,7 +334,7 @@ namespace Spard.Transitions
                                 }
                                 else
                                 {
-                                    ((TransitionState)state).secondTable.Add(Tuple.Create(input, new TransitionLink(states[nextState], actions)));
+                                    ((TransitionState)state).SecondTable.Add(Tuple.Create(input, new TransitionLink(states[nextState], actions)));
                                 }
                             }
                         }
@@ -351,7 +349,7 @@ namespace Spard.Transitions
                     {
                         foreach (var item in links)
                         {
-                            ((TransitionState)states[item.Item1]).table[item.Item2] = new TransitionLink(state, item.Item3);
+                            ((TransitionState)states[item.Item1]).Table[item.Item2] = new TransitionLink(state, item.Item3);
                         }
                     }
 
@@ -359,7 +357,7 @@ namespace Spard.Transitions
                     {
                         foreach (var item in links2)
                         {
-                            ((TransitionState)states[item.Item1]).secondTable.Add(Tuple.Create(item.Item2, new TransitionLink(state, item.Item3)));
+                            ((TransitionState)states[item.Item1]).SecondTable.Add(Tuple.Create(item.Item2, new TransitionLink(state, item.Item3)));
                         }
                     }
                 }

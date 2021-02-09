@@ -1,0 +1,9 @@
+; Prolog style integer calculator
+; The resulting value is passed as set argument
+; [ignoresp] is used to ignore spaces in text
+
+<Num $v>  := <SP>*($v :: <d>+) | '(<Sum $v>')
+<Mult $v> := <Mult $a>('*<Num $b> [$v = $a * $b] | '/<Num $b> [$v = $a / $b]) | <Num $v>
+<Sum $v>  := <Sum $a>('+<Mult $b> [$v = $a + $b] | '-<Mult $b> [$v = $a - $b]) | <Mult $v>
+
+[ignoresp][lrec]<Sum $v>[line]% => $v

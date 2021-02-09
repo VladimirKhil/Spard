@@ -1,0 +1,8 @@
+; Check whether the entered string belongs to the specified context-sensitive grammar (a(^n)b(^n)c(^n))
+
+[$n :: <i>]
+
+(a#$n)(b#$n)(c#$n)[line]% => 1
+<s>                       => 0
+
+<BR> => <BR>
