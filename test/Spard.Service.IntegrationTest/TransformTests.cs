@@ -18,9 +18,6 @@ namespace Spard.Service.IntegrationTest
             var examples = await SpardClient.Examples.GetExamplesAsync();
             foreach (var example in examples)
             {
-                if (example.Id != 25)
-                    continue;
-
                 if (!exampleResults.TryGetValue(example.Id, out var expectedResult))
                 {
                     Assert.Fail("Unknown example: {0}", example.Id);

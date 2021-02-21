@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Spard.Service.IntegrationTest
 {
-    public sealed class ExamplesTests: TestsBase
+    public sealed class ExamplesTests : TestsBase
     {
         [Test]
         public async Task GetExamples_OkAsync()

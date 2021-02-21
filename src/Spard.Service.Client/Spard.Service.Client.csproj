@@ -7,7 +7,6 @@
     <Authors>Vladimir Khil</Authors>
     <Description>Http client for Spard service</Description>
     <Copyright>@Vladimir Khil</Copyright>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/VladimirKhil/Spard</PackageProjectUrl>
     <RepositoryUrl>https://github.com/VladimirKhil/Spard</RepositoryUrl>
     <PackageTags>Spard</PackageTags>
@@ -25,13 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Spard.Service.Contract\Spard.Service.Contract.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
   </ItemGroup>
 
 </Project>

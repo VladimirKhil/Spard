@@ -8,12 +8,24 @@ namespace Spard.Service.Client
     /// <inheritdoc />
     public sealed class SpardClient : ISpardClient
     {
+        /// <summary>
+        /// Gets client options.
+        /// </summary>
         public SpardClientOptions Options { get; }
 
+        /// <summary>
+        /// Provides API for working with SPARD examples.
+        /// </summary>
         public IExamplesApi Examples { get; }
 
+        /// <summary>
+        /// Provides API for executing SPARD expressions.
+        /// </summary>
         public ITransformApi Transform { get; }
 
+        /// <summary>
+        /// Provides API for refactoring SPARD expressions.
+        /// </summary>
         public ISpardApi Spard { get; }
 
         /// <summary>

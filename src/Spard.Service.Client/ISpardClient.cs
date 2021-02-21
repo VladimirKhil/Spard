@@ -1,7 +1,7 @@
 ﻿namespace Spard.Service.Client
 {
     /// <summary>
-    /// SPARD service client.
+    /// Defines SPARD service client.
     /// </summary>
     public interface ISpardClient
     {
