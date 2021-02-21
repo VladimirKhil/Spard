@@ -3,12 +3,12 @@ entries:
   spard:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2021-02-21T19:29:37.8676466+03:00"
+    created: "2021-02-21T19:36:30.194467+03:00"
     description: SPARD service app
     digest: 218f06eeb301525d9e9466cce7f3c2a5601abee688d14270632900d67bfa18bb
     name: spard
     type: application
     urls:
-    - https://github.com/VladimirKhil/Spard/helm/repo/spard-1.0.0.tgz
+    - https://vladimirkhil.github.io/Spard/helm/repo/spard-1.0.0.tgz
     version: 1.0.0
-generated: "2021-02-21T19:29:37.851658+03:00"
+generated: "2021-02-21T19:36:30.1904687+03:00"
