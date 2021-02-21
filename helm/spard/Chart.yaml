@@ -1,0 +1,6 @@
+apiVersion: v2
+name: spard
+description: SPARD service app
+type: application
+version: 1.0.0
+appVersion: 1.0.0
