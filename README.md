@@ -18,6 +18,7 @@ Projects description:
 * *test\Spard.Test*: SPARD implementation test which also provides a set of helpful SPARD examples
 * *test\Spard.Service.IntegrationTest*: provides test methods for running SPARD Service instance
 * *web*: SPARD Service web client
+* *helm*: Helm chart source code and repo
 
 You can test working SPARD examples and language interpreter here: http://vladimirkhil.com/lingware/spard/implementation?culture=en-US
 
@@ -26,3 +27,13 @@ You can deploy standalone SPARD service in Docker and test it with .NET Core Spa
 Spard service Docker: https://hub.docker.com/repository/docker/vladimirkhil/spard
 
 Spard service client NuGet package: https://www.nuget.org/packages/Spard.Service.Client
+
+Spard service web client NPM package: https://www.npmjs.com/package/spard-client
+
+Helm usage in Chart.yaml dependencies:
+
+```
+- name: spard
+  version: "1.0.0"
+  repository: "https://vladimirkhil.github.io/Spard/helm/repo"
+```
