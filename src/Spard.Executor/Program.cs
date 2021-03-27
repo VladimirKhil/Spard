@@ -1,8 +1,9 @@
-﻿using Spard.Core;
-using Spard.Exceptions;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Spard.Core;
+using Spard.Exceptions;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 namespace Spard.Executor
 {
     /// <summary>
-    /// SPARD interpreter as a console application
+    /// Represents SPARD interpreter as a console application.
     /// </summary>
     public static class Program
     {
@@ -42,7 +43,9 @@ namespace Spard.Executor
         private static int ProcessArgs(string[] args)
         {
             if (args.Length == 0 || args.Length == 1 && args[0] == "/?")
+            {
                 return 1;
+            }
 
             var mode = args[0];
 
@@ -73,7 +76,9 @@ namespace Spard.Executor
         private static bool ProcessRulesFile(ref string rulesFile)
         {
             if (!Path.IsPathRooted(rulesFile))
+            {
                 rulesFile = Path.Combine(AppContext.BaseDirectory, rulesFile);
+            }
 
             if (!File.Exists(rulesFile))
             {
@@ -115,8 +120,10 @@ namespace Spard.Executor
         private static int Run(string[] args)
         {
             if (args.Length == 1)
+            {
                 return 1;
-            
+            }
+
             var rulesFile = args[1];
             var readRules = rulesFile == "/rules" && args.Length > 1;
 
@@ -126,7 +133,9 @@ namespace Spard.Executor
             if (readRules)
             {
                 if (args.Length == 2)
+                {
                     return 1;
+                }
 
                 argsIndex++;
                 int.TryParse(args[2], out rulesLength);
@@ -134,7 +143,9 @@ namespace Spard.Executor
             else
             {
                 if (!ProcessRulesFile(ref rulesFile))
+                {
                     return -1;
+                }
             }
 
             var verbose = false;
@@ -170,7 +181,9 @@ namespace Spard.Executor
                         if (inputFileName == null)
                         {
                             if (!Path.IsPathRooted(arg))
+                            {
                                 arg = Path.Combine(AppContext.BaseDirectory, arg);
+                            }
 
                             if (!File.Exists(arg))
                             {
@@ -198,26 +211,24 @@ namespace Spard.Executor
             }
 
             if (transformer == null)
+            {
                 return -2;
+            }
 
             try
             {
                 if (maxMilliseconds > 0)
                 {
-                    Task<int> task;
-                    using (var source = new CancellationTokenSource())
-                    {
-                        task = Task.Run(() => Transform(transformer, verbose, useTable, input, inputFileName, source.Token), source.Token);
-                        source.CancelAfter(maxMilliseconds);
+                    using var source = new CancellationTokenSource(maxMilliseconds);
+                    var task = Task.Run(() => Transform(transformer, verbose, useTable, input, inputFileName, source.Token), source.Token);
 
-                        try
-                        {
-                            task.Wait();
-                        }
-                        catch (AggregateException exc)
-                        {
-                            throw exc.InnerException;
-                        }
+                    try
+                    {
+                        task.Wait();
+                    }
+                    catch (AggregateException exc)
+                    {
+                        throw exc.InnerException;
                     }
 
                     return task.Result;
@@ -233,7 +244,9 @@ namespace Spard.Executor
                     Console.Error.WriteLine("{0}({1},{2}): PROCESSING ERROR", inputFileName, position.Item1, position.Item2);
 
                     if (verbose)
+                    {
                         Console.Error.WriteLine("BEST STACK TRACE:\r\n{0}", exc.PrintBestTryStackTrace());
+                    }
                 }
                 else
                 {
@@ -269,14 +282,18 @@ namespace Spard.Executor
         private static int CreateTable(string[] args)
         {
             if (args.Length == 1)
+            {
                 return 1;
+            }
 
             var rulesFile = args[1];
             var readRules = rulesFile == "/rules";
             if (!readRules && !ProcessRulesFile(ref rulesFile))
+            {
                 return -1;
+            }
 
-            int maxMilliseconds = 0;
+            var maxMilliseconds = 0;
 
             for (int argsIndex = 2; argsIndex < args.Length; argsIndex++)
             {
@@ -307,7 +324,9 @@ namespace Spard.Executor
             }
 
             if (transformer == null)
+            {
                 return -2;
+            }
 
             if (maxMilliseconds > 0)
             {
@@ -326,8 +345,8 @@ namespace Spard.Executor
 
                 return task.Result;
             }
-            else
-                return VisualizeTable(transformer);
+            
+            return VisualizeTable(transformer);
         }
 
         private static int VisualizeTable(TreeTransformer transformer)
@@ -439,19 +458,15 @@ namespace Spard.Executor
             finally
             {
                 if (compile)
+                {
                     output.Dispose();
+                }
             }
             
             if (!compile || result != 0)
                 return result;
 
             var syntaxTree = CSharpSyntaxTree.ParseText(sb.ToString());
-
-            //var references = new MetadataReference[] { };
-            //{
-            //    MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location),
-            //    MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location)
-            //};
 
             var compilation = CSharpCompilation.Create("Spard.Transform", new[] { syntaxTree }, null, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
             var compilationResult = compilation.Emit("out.dll");
@@ -506,6 +521,7 @@ namespace Spard.Executor
             Console.WriteLine("<rules.file>: name of the file with SPARD transformation rules");
             Console.WriteLine("<input.file>: name of the file containing input data");
             Console.WriteLine("/verbose (/v): display of extended diagnostic messages flag");
+            Console.WriteLine("/time (/t): limit execution time in milliseconds");
 
             Console.WriteLine();
             Console.WriteLine("Input data is read from the input stream or from <input.file>, if this parameter is set");
@@ -532,11 +548,11 @@ namespace Spard.Executor
         private static int Transform(TreeTransformer transformer, bool verbose, bool useTable, TextReader input, string inputFileName, CancellationToken cancellationToken = default)
         {
 #if DEBUG
-            var t1 = DateTime.Now;
+            var stopwatch = Stopwatch.StartNew();
 #endif
             if (useTable)
             {
-                var tableTransformer = transformer.BuildTableTransformer();
+                var tableTransformer = transformer.BuildTableTransformer(cancellationToken);
                 foreach (var partialResult in tableTransformer.Transform(input, cancellationToken))
                 {
                     Console.Out.Write(partialResult);
@@ -551,8 +567,7 @@ namespace Spard.Executor
             }
 
 #if DEBUG
-            var t2 = DateTime.Now;
-            System.Diagnostics.Debug.WriteLine(t2 - t1);
+            Debug.WriteLine("Elapsed time: " + stopwatch.Elapsed);
 #endif
 
             return 0;

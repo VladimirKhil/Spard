@@ -13,12 +13,13 @@ using System.Text;
 namespace Spard.Expressions
 {
     /// <summary>
-    /// Function call
+    /// Describes a function call.
     /// </summary>
+    /// <inheritdoc cref="Unary" />
     public sealed class FunctionCall : Unary, IInstructionExpression
     {
         /// <summary>
-        /// Maximum allowed call stack depth
+        /// Maximum allowed call stack depth.
         /// </summary>
         private const int MaxFunctionCallDepth = 50;
 
@@ -27,32 +28,17 @@ namespace Spard.Expressions
         private StringValueMatch _name = null;
 
         /// <summary>
-        /// Вызываемая функция
+        /// Function to call.
         /// </summary>
         private ITransformFunction _function = null;
 
-        protected internal override Relationship Assotiative
-        {
-            get
-            {
-                return Relationship.Right;
-            }
-        }
+        protected internal override Relationship Assotiative => Relationship.Right;
 
-        protected internal override Relationship OperandPosition
-        {
-            get { return Relationship.Right; }
-        }
+        protected internal override Relationship OperandPosition => Relationship.Right;
 
-        protected internal override Priorities Priority
-        {
-            get { return Priorities.FunctionCall; }
-        }
+        protected internal override Priorities Priority => Priorities.FunctionCall;
 
-        protected internal override string Sign
-        {
-            get { return "@"; }
-        }
+        protected internal override string Sign => "@";
 
         public FunctionCall()
         {
@@ -75,13 +61,19 @@ namespace Spard.Expressions
             if (context == null) // second function call
             {
                 if (_function == null)
+                {
                     return null;
+                }
             }
             else
+            {
                 _initContext = context;
+            }
 
             if (context.Runtime != null && context.Runtime.CancellationToken.IsCancellationRequested)
+            {
                 return null;
+            }
 
             var args = (TupleValue)Args.Apply(_initContext);
             var argsArray = args.Items;
@@ -92,14 +84,16 @@ namespace Spard.Expressions
         }
 
         /// <summary>
-        /// Call SPARD function
+        /// Calls SPARD function.
         /// </summary>
         internal static object Call(string name, object[] args, IContext context, Relationship direction = Relationship.Right)
         {
             ITransformFunction function = null;
             ContextParameter param = null;
             if (direction == Relationship.Left)
+            {
                 param = context.UseParameter(Parameters.Left);
+            }
 
             try
             {
@@ -108,7 +102,9 @@ namespace Spard.Expressions
             finally
             {
                 if (direction == Relationship.Left)
+                {
                     param.Free(context);
+                }
             }
         }
 
@@ -122,7 +118,9 @@ namespace Spard.Expressions
                         var item = ValueConverter.ConvertToSingle(args[1]);
 
                         if (bag == BindingManager.UnsetValue)
+                        {
                             return item;
+                        }
 
                         if (bag is TupleValue tupleValue)
                         {
@@ -149,7 +147,9 @@ namespace Spard.Expressions
                         transformer.Mode = TransformMode.Function;
 
                         if (context.GetParameter(Parameters.Left))
+                        {
                             transformer = transformer.Reverse();
+                        }
 
                         var parameters = args.Skip(1);
                         return ((ITransformFunction)transformer).TransformCoreAll(parameters.ToArray(), context.Runtime.CancellationToken);
@@ -161,7 +161,9 @@ namespace Spard.Expressions
                         {
                             function = context.Root.GetFunction("", (string)args[1], context.GetParameter(Parameters.Left) ? Directions.Left : Directions.Right); // Вызов пользовательской функции
                             if (function == null)
-                                throw new FunctionDefinitionNotFoundException() { FunctionName = args[1].ToString() };
+                            {
+                                throw new FunctionDefinitionNotFoundException { FunctionName = args[1].ToString() };
+                            }
                         }
 
                         var parameter = args[2];
@@ -219,13 +221,17 @@ namespace Spard.Expressions
                 default: // It is not a builtin function
                     {
                         if (context.Root.FunctionCallDepth > MaxFunctionCallDepth)
+                        {
                             throw new Exception("Maximum number of nested function calls exceeded! Infinite recursion possible");
+                        }
 
                         if (function == null)
                         {
                             function = context.Root.GetFunction("", name, context.GetParameter(Parameters.Left) ? Directions.Left : Directions.Right); // User function call
                             if (function == null)
+                            {
                                 throw new FunctionDefinitionNotFoundException { FunctionName = name };
+                            }
                         }
 
                         try
@@ -255,28 +261,13 @@ namespace Spard.Expressions
             return result;
         }
 
-        public override Expression CloneCore()
-        {
-            throw new NotImplementedException();
-        }
+        public override Expression CloneCore() => throw new NotImplementedException();
 
-        public override Expression CloneExpression()
-        {
-            return new FunctionCall(_operand.CloneExpression());
-        }
+        public override Expression CloneExpression() => new FunctionCall(_operand.CloneExpression());
 
-        bool IInstructionExpression.RightArgumentNeeded
-        {
-            get { return false; }
-        }
+        bool IInstructionExpression.RightArgumentNeeded => false;
 
-        public string Name
-        {
-            get
-            {
-                return _name.Value;
-            }
-        }
+        public string Name => _name.Value;
 
         public TupleValueMatch Args { get; private set; } = null;
 

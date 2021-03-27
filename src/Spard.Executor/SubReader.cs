@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Spard.Executor
 {
     /// <summary>
-    /// 
+    /// Wraps a <see cref="TextReader" /> allowing to read only the fixed number of characters from it.
     /// </summary>
     internal sealed class SubReader : TextReader
     {
@@ -16,16 +13,23 @@ namespace Spard.Executor
 
         private long _position;
 
-        public SubReader(TextReader baseStream, long length)
+        /// <summary>
+        /// Initializes a new instance of <see cref="SubReader" />.
+        /// </summary>
+        /// <param name="baseReader">Wrapper reader.</param>
+        /// <param name="length">Maximum number of characters that can be read from the reader.</param>
+        public SubReader(TextReader baseReader, long length)
         {
-            _baseReader = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
+            _baseReader = baseReader ?? throw new ArgumentNullException(nameof(baseReader));
             _length = length;
         }
 
         public override int Read()
         {
             if (_position++ < _length)
+            {
                 return _baseReader.Read();
+            }
 
             return -1;
         }
@@ -33,7 +37,9 @@ namespace Spard.Executor
         public override int Peek()
         {
             if (_position + 1 <= _length)
+            {
                 return _baseReader.Peek();
+            }
 
             return -1;
         }

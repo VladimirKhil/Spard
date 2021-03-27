@@ -6,23 +6,19 @@ using System.Linq;
 namespace Spard.Expressions
 {
     /// <summary>
-    /// Binary operation
+    /// Describes binary operation.
     /// </summary>
+    /// <inheritdoc cref="Expression" />
     public abstract class Binary: Expression
     {
-        /// <summary>
-        /// Left part of operation
-        /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         protected Expression _left = null;
-        /// <summary>
-        /// Right part of operation
-        /// </summary>
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         protected Expression _right = null;
 
         /// <summary>
-        /// Left part of operation
+        /// Left part of operation.
         /// </summary>
         public Expression Left
         {
@@ -31,7 +27,7 @@ namespace Spard.Expressions
         }
 
         /// <summary>
-        /// Right part of operation
+        /// Right part of operation.
         /// </summary>
         public Expression Right
         {
@@ -39,11 +35,19 @@ namespace Spard.Expressions
             set { _right = value; }
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Binary" /> class.
+        /// </summary>
         protected Binary()
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Binary" /> class.
+        /// </summary>
+        /// <param name="left">Left function argument.</param>
+        /// <param name="right">Right function argument.</param>
         protected Binary(Expression left, Expression right)
         {
             _left = left;
@@ -51,7 +55,7 @@ namespace Spard.Expressions
         }
 
         /// <summary>
-        /// Expression operands
+        /// Returns expression operands.
         /// </summary>
         public override IEnumerable<Expression> Operands()
         {
@@ -66,25 +70,26 @@ namespace Spard.Expressions
             if (length > 0)
             {
                 _left = opArray[0];
-                if (length > 1)
-                    _right = opArray[1];
-                else
-                    _right = Empty.Instance;
+                _right = length > 1 ? opArray[1] : Empty.Instance;
             }
             else
+            {
                 _left = _right = Empty.Instance;
+            }
         }
 
         public override string ToString()
         {
             if (_left == null)
+            {
                 return Sign;
+            }
 
             var result = new StringBuilder();
 
-            base.AppendOperand(result, _left);
+            AppendOperand(result, _left);
             if (Sign.Length > 0) result.AppendFormat(" {0} ", Sign);
-            base.AppendOperand(result, _right);
+            AppendOperand(result, _right);
 
             return result.ToString();
         }

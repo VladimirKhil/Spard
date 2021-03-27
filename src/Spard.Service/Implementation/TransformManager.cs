@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Spard.Core;
 using Spard.Exceptions;
 using Spard.Service.Configuration;
@@ -121,7 +120,10 @@ namespace Spard.Service.Implementation
 
             foreach (var partialResult in transformer.StepTransform(input, cancellationToken))
             {
-                result.Append(new string(partialResult.Cast<char>().ToArray()));
+                foreach (char resultItem in partialResult)
+                {
+                    result.Append(resultItem);
+                }
             }
 
             return result.ToString();
@@ -159,7 +161,7 @@ namespace Spard.Service.Implementation
             return sb.ToString();
         }
 
-        private string GenerateSourceCode(TreeTransformer transformer, CancellationToken cancellationToken = default)
+        private static string GenerateSourceCode(TreeTransformer transformer, CancellationToken cancellationToken = default)
         {
             var tableTransformer = transformer.BuildTableTransformer(cancellationToken);
 

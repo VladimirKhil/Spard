@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Spard.Exceptions;
 using Spard.Service.Contract;
 using System;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Spard.Service.Controllers
@@ -28,15 +31,21 @@ namespace Spard.Service.Controllers
         /// <param name="transformRequest">Transformation request.</param>
         /// <returns>Transformation result.</returns>
         [HttpPost]
-        public async Task<ActionResult<ProcessResult<string>>> TransformAsync([FromBody] TransformRequest transformRequest)
+        public async Task<ActionResult<ProcessResult<string>>> TransformAsync(
+            [FromBody] TransformRequest transformRequest,
+            CancellationToken cancellationToken = default)
         {
             try
             {
-                return await _transformManager.TransformAsync(transformRequest);
+                return await _transformManager.TransformAsync(transformRequest, cancellationToken);
+            }
+            catch (SpardCancelledException exc)
+            {
+                return StatusCode((int)HttpStatusCode.RequestTimeout, exc.Message);
             }
             catch (Exception exc)
             {
-                return BadRequest(exc);
+                return BadRequest(exc.Message);
             }
         }
 
@@ -46,15 +55,17 @@ namespace Spard.Service.Controllers
         /// <param name="transformRequest">Transformation request.</param>
         /// <returns>Transformation result including comparison with standard transformer.</returns>
         [HttpPost("table")]
-        public async Task<ActionResult<TransformTableResult>> TransformTableAsync([FromBody] TransformRequest transformRequest)
+        public async Task<ActionResult<TransformTableResult>> TransformTableAsync(
+            [FromBody] TransformRequest transformRequest,
+            CancellationToken cancellationToken = default)
         {
             try
             {
-                return await _transformManager.TransformTableAsync(transformRequest);
+                return await _transformManager.TransformTableAsync(transformRequest, cancellationToken);
             }
             catch (Exception exc)
             {
-                return BadRequest(exc);
+                return BadRequest(exc.Message);
             }
         }
     }

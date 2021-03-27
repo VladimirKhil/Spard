@@ -1,10 +1,10 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/runtime-deps:5.0-alpine AS base
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+RUN apk add --no-cache icu-libs
 WORKDIR /app
 EXPOSE 5000
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["src/Spard.Service/Spard.Service.csproj", "src/Spard.Service/"]
 COPY ["src/Spard.Service.Contract/Spard.Service.Contract.csproj", "src/Spard.Service.Contract/"]
@@ -12,12 +12,9 @@ COPY ["src/Spard/Spard.csproj", "src/Spard/"]
 RUN dotnet restore "src/Spard.Service/Spard.Service.csproj"
 COPY . .
 WORKDIR "/src/src/Spard.Service"
-RUN dotnet build "Spard.Service.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "Spard.Service.csproj" -c Release -o /app/publish
+RUN dotnet publish "Spard.Service.csproj" -p:PublishSingleFile=true -r linux-musl-x64 -p:PublishTrimmed=true -p:InvariantGlobalization=false -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Spard.Service.dll", "--urls", "http://*:5000"]
+COPY --from=build /app/publish .
+ENTRYPOINT ["./Spard.Service", "--urls", "http://*:5000"]

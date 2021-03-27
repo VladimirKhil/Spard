@@ -16,7 +16,7 @@ using Spard.Core;
 namespace Spard
 {
     /// <summary>
-    /// Transformation tree
+    /// Represents SPARD transformation tree.
     /// </summary>
     public class TreeTransformer : Transformer, IExpressionRoot, ITransformFunction
     {
@@ -68,14 +68,14 @@ namespace Spard
         public Dictionary<Tuple<string, string>, Function[]> FunctionDefinitions { get { return _functionDefinitions; } set { _functionDefinitions = value; } }
 
         /// <summary>
-        /// Sets definitions
+        /// Sets definitions.
         /// </summary>
         public Dictionary<Tuple<string, string, int>, Definition[]> SetDefinitions { get { return setDefinitions; } set { setDefinitions = value; } }
 
         private Dictionary<string, TransformerHelper.UserFunc> userFunctions;
 
         /// <summary>
-        /// External (client-defined) functions
+        /// External (client-defined) functions.
         /// </summary>
         public Dictionary<string, TransformerHelper.UserFunc> UserFunctions
         {
@@ -89,9 +89,18 @@ namespace Spard
         }
 
         /// <summary>
-        /// Module loading event which allows to return links to other modules by their names
+        /// Module loading event which allows to return links to other modules by their names.
         /// </summary>
         public event Func<string, TextReader> LoadModule;
+
+        int IExpressionRoot.FunctionCallDepth { get; set; }
+
+        public bool SimpleMatch { get; set; }
+
+        /// <summary>
+        /// Force all sets to be replaced inline with their definitions.
+        /// </summary>
+        public bool SuppressInline { get; private set; }
 
         #endregion
 
@@ -221,7 +230,9 @@ namespace Spard
                 }
 
                 if (!SuppressInline)
+                {
                     InlineSets(builder);
+                }
 
                 // Check functions and sets existense
                 foreach (var item in builder.FunctionCalls)
@@ -268,9 +279,9 @@ namespace Spard
         }
 
         /// <summary>
-        /// Replace sets with their definitions
+        /// Replaces sets with their definitions.
         /// </summary>
-        /// <param name="builder">Expression builer</param>
+        /// <param name="builder">Expression builder.</param>
         private void InlineSets(ExpressionBuilder builder)
         {
             // Create set dependency matrix
@@ -433,16 +444,22 @@ namespace Spard
         {
             if (instr.Operand is TypeDefinition def)
             {
-                typesTable[((Query)def.Left).Name] = def.Right;
+                _typesTable[((Query)def.Left).Name] = def.Right;
                 return;
             }
 
             if (instr.Operand is StringValueMatch str)
             {
-                if (str.Value == "simplematch")
-                    SimpleMatch = true;
-                else if (str.Value == "suppressinline")
-                    SuppressInline = true;
+                switch (str.Value)
+                {
+                    case "simplematch":
+                        SimpleMatch = true;
+                        break;
+
+                    case "suppressinline":
+                        SuppressInline = true;
+                        break;
+                }
             }
 
             if (!(instr.Operand is TupleValueMatch list) || list._operands.Length != 2 && list._operands.Length != 3)
@@ -672,7 +689,7 @@ namespace Spard
                 _mode = _mode,
                 SetDefinitions = SetDefinitions,
                 _direction = _direction == Directions.Left ? Directions.Right : Directions.Left,
-                typesTable = typesTable,
+                _typesTable = _typesTable,
                 optimizedFunctions = optimizedFunctions
             };
 
@@ -742,7 +759,9 @@ namespace Spard
                 }
 
                 if (runtime.CancellationToken.IsCancellationRequested)
-                    throw new SpardException("Transformation was cancelled!");
+                {
+                    throw new SpardCancelledException("Transformation was cancelled!");
+                }
 
                 switch (_mode)
                 {
@@ -962,30 +981,19 @@ namespace Spard
                 newDef[existing.Length] = def;
 
                 setDefinitions[key] = newDef;
-                //var or = existing.Right as Or;
-                //if (or != null)
-                //{
-                //    var operands = or.OperandsArray;
-                //    var newOperands = new Expression[operands.Length + 1];
-                //    Array.Copy(operands, newOperands, operands.Length);
-                //    newOperands[operands.Length] = def.Right;
-                //    or.SetOperands(newOperands);
-                //}
-                //else
-                //{
-                //    existing.Right = new Or(existing.Right, def.Right);
-                //}
 
                 CallEverywhere(RefreshDefinitions);
             }
             else
+            {
                 setDefinitions[key] = new Definition[] { def };
+            }
         }
 
         /// <summary>
-        /// Replace set definitions
+        /// Replaces set definition.
         /// </summary>
-        /// <param name="def">New set definition that replaces existing</param>
+        /// <param name="def">New set definition that replaces existing.</param>
         public void ReplaceSetDefinition(Definition def)
         {
             var set = (Set)def.Left;
@@ -1027,13 +1035,12 @@ namespace Spard
                 if (args[0] is IEnumerable enumerable)
                 {
                     var casted = enumerable;
-                    if (casted.Cast<object>().Any())
-                        result = Transform(casted);
-                    else
-                        result = TransformEmpty(cancellationToken);
+                    result = casted.Cast<object>().Any() ? Transform(casted) : TransformEmpty(cancellationToken);
                 }
                 else
+                {
                     result = Transform(new object[] { args[0] });
+                }
             }
             else
             {
@@ -1053,19 +1060,14 @@ namespace Spard
             return new BufferedEnumerable(result);
         }
 
-        private Dictionary<string, Expression> typesTable = new Dictionary<string, Expression>();
+        private Dictionary<string, Expression> _typesTable = new Dictionary<string, Expression>();
 
-        public Expression GetVariableType(string name)
-        {
-            if (typesTable.TryGetValue(name, out Expression result))
-                return result;
-
-            return Any.Instance;
-        }
-
-        int IExpressionRoot.FunctionCallDepth { get; set; }
-
-        public bool SimpleMatch { get; set; }
-        public bool SuppressInline { get; private set; }
+        /// <summary>
+        /// Gets variable type as expression.
+        /// </summary>
+        /// <param name="name">Variable name.</param>
+        /// <returns>Expression describing variable type.</returns>
+        public Expression GetVariableType(string name) =>
+            _typesTable.TryGetValue(name, out Expression result) ? result : Any.Instance;
     }
 }

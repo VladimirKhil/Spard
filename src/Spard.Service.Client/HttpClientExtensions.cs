@@ -59,7 +59,7 @@ namespace Spard.Service.Client
                 return JsonSerializer.Deserialize<TResult>(responseBody, SerializerOptions);
             }
 
-            var error = $"Error while making a call to \"{uri}\" with request \"{requestJson}\": ({response.StatusCode}) {response.Content.ReadAsStringAsync()}";
+            var error = $"Error while making a call to \"{uri}\" with request \"{requestJson}\": ({response.StatusCode}) {await response.Content.ReadAsStringAsync()}";
             throw new HttpRequestException(error);
         }
     }

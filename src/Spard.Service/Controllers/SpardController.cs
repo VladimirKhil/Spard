@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Spard.Service.Contract;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Spard.Service.Controllers
@@ -30,15 +31,17 @@ namespace Spard.Service.Controllers
         /// <returns>Table with transformation rules.</returns>
         // TODO: make this method return table model, not just a serialized string.
         [HttpPost("table")]
-        public async Task<ActionResult<ProcessResult<string>>> GenerateTableAsync([FromBody] string transform)
+        public async Task<ActionResult<ProcessResult<string>>> GenerateTableAsync(
+            [FromBody] string transform,
+            CancellationToken cancellationToken = default)
         {
             try
             {
-                return await _transformManager.GenerateTableAsync(transform);
+                return await _transformManager.GenerateTableAsync(transform, cancellationToken);
             }
             catch (Exception exc)
             {
-                return BadRequest(exc);
+                return BadRequest(exc.Message);
             }
         }
 
@@ -48,15 +51,17 @@ namespace Spard.Service.Controllers
         /// <param name="transform">SPARD transformation rules.</param>
         /// <returns>C# source code for transformation rules.</returns>
         [HttpPost("source")]
-        public async Task<ActionResult<ProcessResult<string>>> GenerateSourceCodeAsync([FromBody] string transform)
+        public async Task<ActionResult<ProcessResult<string>>> GenerateSourceCodeAsync(
+            [FromBody] string transform,
+            CancellationToken cancellationToken = default)
         {
             try
             {
-                return await _transformManager.GenerateSourceCodeAsync(transform);
+                return await _transformManager.GenerateSourceCodeAsync(transform, cancellationToken);
             }
             catch (Exception exc)
             {
-                return BadRequest(exc);
+                return BadRequest(exc.Message);
             }
         }
     }

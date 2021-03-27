@@ -8,14 +8,12 @@ using Spard.Core;
 namespace Spard.Expressions
 {
     /// <summary>
-    /// Function
+    /// Describes a function.
     /// </summary>
+    /// <inheritdoc cref="Directed" />
     public sealed class Function: Directed
     {
-        protected internal override Priorities Priority
-        {
-            get { return Priorities.Function; }
-        }
+        protected internal override Priorities Priority => Priorities.Function;
 
         protected internal override string Sign
         {
@@ -27,44 +25,40 @@ namespace Spard.Expressions
             }
         }
 
-        protected internal override Relationship Assotiative
-        {
-            get
-            {
-                return Relationship.Right;
-            }
-        }
+        protected internal override Relationship Assotiative => Relationship.Right;
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Function" /> class.
+        /// </summary>
         public Function()
         {
             
         }
 
         /// <summary>
-        /// Creates a function
+        /// Initializes a new instance of <see cref="Function" /> class.
         /// </summary>
-        /// <param name="direction">Function direction of application</param>
+        /// <param name="direction">Function direction of application.</param>
         internal Function(Directions direction)
             : base(direction)
         {
             
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Function" /> class.
+        /// </summary>
+        /// <param name="left">Left function argument.</param>
+        /// <param name="right">Right function argument.</param>
         public Function(Expression left, Expression right)
             : base(left, right)
         {
 
         }
 
-        internal override bool MatchCore(ISource input, ref IContext context, bool next)
-        {
-            throw new NotImplementedException();
-        }
+        internal override bool MatchCore(ISource input, ref IContext context, bool next) => throw new NotImplementedException();
 
-        internal override object Apply(IContext context)
-        {
-            throw new NotImplementedException();
-        }
+        internal override object Apply(IContext context) => throw new NotImplementedException();
 
         internal override TransitionTable BuildTransitionTableCore(TransitionSettings settings, bool isLast)
         {
@@ -101,11 +95,12 @@ namespace Spard.Expressions
         }
 
         /// <summary>
-        /// "Expand" expression by replacing sets in it with their definitions
+        /// "Expands" expression by replacing sets in it with their definitions.
         /// </summary>
-        /// <param name="expression">Source expression</param>
-        /// <param name="root">Expression root containing set definitions</param>
-        /// <returns>Expanded expression</returns>
+        /// <param name="expression">Source expression.</param>
+        /// <param name="root">Expression root containing set definitions.</param>
+        /// <param name="operandsChanged">Have any operands in expression been changed.</param>
+        /// <returns>Expanded expression.</returns>
         private Expression Expand(Expression expression, IExpressionRoot root, out bool operandsChanged)
         {
             if (expression is Set set)
@@ -139,18 +134,20 @@ namespace Spard.Expressions
         }
 
         /// <summary>
-        /// Convert the input object according to internal rules and return the result
+        /// Converts the input object according to internal rules and return the result.
         /// </summary>
-        /// <param name="input">Input object</param>
-        /// <param name="direction">Rule application direction</param>
-        /// <param name="next">Should next (otherwise first) transformation result be returned</param>
-        /// <param name="runtime">Information about transformation</param>
-        /// <param name="allowEmpty">Are empty results allowed</param>
-        /// <returns>Transformation result or null in case of failure</returns>
+        /// <param name="input">Input object.</param>
+        /// <param name="direction">Rule application direction.</param>
+        /// <param name="next">Should next (otherwise first) transformation result be returned.</param>
+        /// <param name="runtime">Information about transformation.</param>
+        /// <param name="allowEmpty">Are empty results allowed.</param>
+        /// <returns>Transformation result or null in case of failure.</returns>
         internal IEnumerable<object> Transform(ISource input, Directions direction, bool next, RuntimeInfo runtime, bool allowEmpty = false)
         {
             if ((Direction & direction) == 0)
+            {
                 return null;
+            }
 
             IContext context = new Context(runtime);
             context.SetParameter(Parameters.SearchBestVariant, runtime.SearchBestVariant);
@@ -168,7 +165,9 @@ namespace Spard.Expressions
             } while (isMatched && saveStart >= input.Position && !allowEmpty); // Templates matching empty strings are not allowed
 
             if (!isMatched)
+            {
                 return null;
+            }
 
             return ValueConverter.ConvertToEnumerable(result.Apply(context));
         }
@@ -176,14 +175,13 @@ namespace Spard.Expressions
         public override bool Equals(Expression other)
         {
             if (!(other is Function function))
+            {
                 return false;
+            }
 
             return _left.Equals(function._left) && _right.Equals(function._right);
         }
 
-        public override Expression CloneCore()
-        {
-            return new Function(Direction);
-        }
+        public override Expression CloneCore() => new Function(Direction);
     }
 }
