@@ -1,10 +1,10 @@
-FROM mcr.microsoft.com/dotnet/runtime-deps:5.0-alpine AS base
+FROM mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine AS base
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 RUN apk add --no-cache icu-libs
 WORKDIR /app
 EXPOSE 5000
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build
 WORKDIR /src
 COPY ["src/Spard.Service/Spard.Service.csproj", "src/Spard.Service/"]
 COPY ["src/Spard.Service.Contract/Spard.Service.Contract.csproj", "src/Spard.Service.Contract/"]
