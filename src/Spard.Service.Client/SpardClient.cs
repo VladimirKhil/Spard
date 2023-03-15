@@ -38,6 +38,7 @@ namespace Spard.Service.Client
             Options = options.Value;
 
             httpClient.BaseAddress = new Uri(Options.ServiceUri);
+
             if (Options.Culture != null)
             {
                 httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(Options.Culture));

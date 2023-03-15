@@ -9,7 +9,7 @@ namespace Spard.Service.Implementation
     /// <inheritdoc />
     internal sealed class ExamplesRepository : IExamplesRepository
     {
-        private readonly Dictionary<int, ExampleModel> _examples = new Dictionary<int, ExampleModel>();
+        private readonly Dictionary<int, ExampleModel> _examples = new();
 
         public void AddExample(int exampleId, ExampleModel exampleModel)
         {

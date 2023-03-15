@@ -8,7 +8,7 @@ namespace Spard.Service.Configuration
     public sealed class SpardConfiguration
     {
         /// <summary>
-        /// Maxumim duration of SPARD transformation.
+        /// Maximum duration of SPARD transformation.
         /// </summary>
         public TimeSpan TransformMaximumDuration { get; set; } = TimeSpan.FromSeconds(2);
     }

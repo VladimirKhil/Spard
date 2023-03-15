@@ -42,7 +42,8 @@ namespace Spard.Service.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<SpardExampleInfo> GetExample(int id,
+        public ActionResult<SpardExampleInfo> GetExample(
+            int id,
             [FromHeader(Name = "Accept-Language")] string acceptLanguage = Constants.DefaultCultureCode)
         {
             var example = _examplesRepository.GetExample(id, CultureHelper.GetCultureFromAcceptLanguageHeader(acceptLanguage));
