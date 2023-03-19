@@ -22,7 +22,7 @@ namespace Spard.Data
         public override bool Equals(object obj)
         {
             if (obj is EnumerableValue enumerableValue)
-                return object.Equals(Value, enumerableValue.Value);
+                return Equals(Value, enumerableValue.Value);
 
             return base.Equals(obj);
         }
