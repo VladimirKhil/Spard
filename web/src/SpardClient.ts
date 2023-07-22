@@ -20,7 +20,7 @@ export default class SpardClient {
 	constructor(private options: SpardClientOptions) { }
 
 	/** Gets all examples. */
-	async getExamplesAsync() {
+	async getExamplesAsync(): Promise<SpardExampleBaseInfo[]> {
 		return this.getAsync<SpardExampleBaseInfo[]>('examples');
 	}
 
@@ -28,7 +28,7 @@ export default class SpardClient {
 	 * Gets example by Id.
 	 * @param id Example Id.
 	 */
-	async getExampleAsync(id: number) {
+	async getExampleAsync(id: number): Promise<SpardExampleInfo> {
 		return this.getAsync<SpardExampleInfo>(`examples/${id}`);
 	}
 
@@ -37,7 +37,7 @@ export default class SpardClient {
 	 * @param transformRequest Transformation request.
 	 * @returns Transformation result.
 	 */
-	async transformAsync(transformRequest: TransformRequest) {
+	async transformAsync(transformRequest: TransformRequest): Promise<ProcessResult<string>> {
 		return this.postAsync<TransformRequest, ProcessResult<string>>('transform', transformRequest);
 	}
 
@@ -46,7 +46,7 @@ export default class SpardClient {
 	 * @param transformRequest Transformation request.
 	 * @returns Transformation result including comparison with standard transformer.
 	 */
-	async transformTableAsync(transformRequest: TransformRequest) {
+	async transformTableAsync(transformRequest: TransformRequest): Promise<TransformTableResult> {
 		return this.postAsync<TransformRequest, TransformTableResult>('transform/table', transformRequest);
 	}
 
@@ -55,7 +55,7 @@ export default class SpardClient {
 	 * @param transform SPARD transformation rules.
 	 * @returns Table with transformation rules.
 	 */
-	async generateTableAsync(transform: string) {
+	async generateTableAsync(transform: string): Promise<ProcessResult<string>> {
 		return this.postAsync<string, ProcessResult<string>>('spard/table', transform);
 	}
 
@@ -64,7 +64,7 @@ export default class SpardClient {
 	 * @param transform SPARD transformation rules.
 	 * @returns C# source code for transformation rules.
 	 */
-	async generateSourceCodeAsync(transform: string) {
+	async generateSourceCodeAsync(transform: string): Promise<ProcessResult<string>> {
 		return this.postAsync<string, ProcessResult<string>>('spard/source', transform);
 	}
 

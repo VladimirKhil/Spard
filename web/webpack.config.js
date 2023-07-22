@@ -1,13 +1,12 @@
 const path = require('path');
-const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
 
-module.exports = (env) => {
+module.exports = () => {
 	return {
 		mode: 'production',
 		entry: './src/SpardClient.ts',
 		module: {
 			rules: [
-				{ test: /\.tsx?$/, use: 'awesome-typescript-loader?silent=true' }
+				{ test: /\.tsx?$/, use: 'ts-loader' }
 			]
 		},
 		resolve: {
@@ -36,9 +35,6 @@ module.exports = (env) => {
 					}
 				}
 			}
-		},
-		plugins: [
-			new CheckerPlugin()
-		]
+		}
 	}
 };
