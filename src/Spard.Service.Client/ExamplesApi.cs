@@ -1,23 +1,18 @@
 ﻿using Spard.Service.Contract;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Net.Http.Json;
 
-namespace Spard.Service.Client
+namespace Spard.Service.Client;
+
+/// <inheritdoc />
+internal sealed class ExamplesApi : IExamplesApi
 {
-    /// <inheritdoc />
-    internal sealed class ExamplesApi : IExamplesApi
-    {
-        private readonly HttpClient _httpClient;
+    private readonly HttpClient _httpClient;
 
-        public ExamplesApi(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
+    public ExamplesApi(HttpClient httpClient) => _httpClient = httpClient;
 
-        public Task<SpardExampleBaseInfo[]> GetExamplesAsync() =>
-            _httpClient.GetJsonAsync<SpardExampleBaseInfo[]>("examples");
+    public Task<SpardExampleBaseInfo[]?> GetExamplesAsync(CancellationToken cancellationToken = default) =>
+        _httpClient.GetFromJsonAsync<SpardExampleBaseInfo[]>("examples", cancellationToken);
 
-        public Task<SpardExampleInfo> GetExampleAsync(int id) =>
-            _httpClient.GetJsonAsync<SpardExampleInfo>($"examples/{id}");
-    }
+    public Task<SpardExampleInfo?> GetExampleAsync(int id, CancellationToken cancellationToken = default) =>
+        _httpClient.GetFromJsonAsync<SpardExampleInfo>($"examples/{id}", cancellationToken);
 }

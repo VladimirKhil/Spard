@@ -1,13 +1,10 @@
-﻿using System;
+﻿namespace Spard.Test;
 
-namespace Spard.Test
+public sealed class TestData : Tuple<string, string?>
 {
-    public sealed class TestData : Tuple<string, string>
+    public TestData(string input, string? output)
+        : base(input, output)
     {
-        public TestData(string input, string output)
-            : base(input, output)
-        {
 
-        }
     }
 }

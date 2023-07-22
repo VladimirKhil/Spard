@@ -1,13 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>Vladimir Khil</Authors>
-    <Company>Vladimir Khil</Company>
+	<TargetFramework>net6.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
     <Description>Spard service contract</Description>
-    <Copyright>@Vladimir Khil</Copyright>
-    <PackageProjectUrl>https://github.com/VladimirKhil/Spard</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/VladimirKhil/Spard</RepositoryUrl>
     <PackageTags>Spard</PackageTags>
     <Version>1.0.2</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

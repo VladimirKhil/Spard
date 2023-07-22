@@ -1,18 +1,17 @@
-﻿namespace Spard.Service.Contract
+﻿namespace Spard.Service.Contract;
+
+/// <summary>
+/// Describes full SPARD example info.
+/// </summary>
+public sealed class SpardExampleInfo : SpardExampleBaseInfo
 {
     /// <summary>
-    /// Describes full SPARD example info.
+    /// Input data.
     /// </summary>
-    public sealed class SpardExampleInfo : SpardExampleBaseInfo
-    {
-        /// <summary>
-        /// Input data.
-        /// </summary>
-        public string Input { get; set; }
+    public string Input { get; set; } = "";
 
-        /// <summary>
-        /// SPARD transformation rules.
-        /// </summary>
-        public string Transform { get; set; }
-    }
+    /// <summary>
+    /// SPARD transformation rules.
+    /// </summary>
+    public string Transform { get; set; } = "";
 }

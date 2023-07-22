@@ -31,8 +31,7 @@ namespace Spard.Service.IntegrationTest
                 Culture = "ru-RU"
             };
 
-            using var httpClient = new HttpClient();
-            var spardClientRus = new SpardClient(httpClient, new OptionsWrapper<SpardClientOptions>(options));
+            var spardClientRus = ServiceCollectionExtensions.CreateSpardClient(options);
 
             var example = await spardClientRus.Examples.GetExampleAsync(5);
             Assert.AreEqual("Двойная замена", example.Name);

@@ -1,18 +1,17 @@
-﻿namespace Spard.Service.Contract
+﻿namespace Spard.Service.Contract;
+
+/// <summary>
+/// Describes SPARD transformation request.
+/// </summary>
+public sealed class TransformRequest
 {
     /// <summary>
-    /// Describes SPARD transformation request.
+    /// Transformation input.
     /// </summary>
-    public sealed class TransformRequest
-    {
-        /// <summary>
-        /// Transformation input.
-        /// </summary>
-        public string Input { get; set; }
+    public string Input { get; set; } = "";
 
-        /// <summary>
-        /// SPARD transformation rules.
-        /// </summary>
-        public string Transform { get; set; }
-    }
+    /// <summary>
+    /// SPARD transformation rules.
+    /// </summary>
+    public string Transform { get; set; } = "";
 }

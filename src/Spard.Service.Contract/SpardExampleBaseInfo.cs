@@ -1,18 +1,17 @@
-﻿namespace Spard.Service.Contract
+﻿namespace Spard.Service.Contract;
+
+/// <summary>
+/// Describes SPARD execution example base info.
+/// </summary>
+public class SpardExampleBaseInfo
 {
     /// <summary>
-    /// Describes SPARD execution example base info.
+    /// Example identifier.
     /// </summary>
-    public class SpardExampleBaseInfo
-    {
-        /// <summary>
-        /// Example identifier.
-        /// </summary>
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        /// <summary>
-        /// Example name.
-        /// </summary>
-        public string Name { get; set; }
-    }
+    /// <summary>
+    /// Example name.
+    /// </summary>
+    public string Name { get; set; } = "";
 }

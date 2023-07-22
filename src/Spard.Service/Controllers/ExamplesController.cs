@@ -46,7 +46,7 @@ namespace Spard.Service.Controllers
             int id,
             [FromHeader(Name = "Accept-Language")] string acceptLanguage = Constants.DefaultCultureCode)
         {
-            var example = _examplesRepository.GetExample(id, CultureHelper.GetCultureFromAcceptLanguageHeader(acceptLanguage));
+            var example = _examplesRepository.TryGetExample(id, CultureHelper.GetCultureFromAcceptLanguageHeader(acceptLanguage));
             return example == null ? NotFound() : (ActionResult<SpardExampleInfo>)example;
         }
     }
