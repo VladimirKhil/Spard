@@ -4,6 +4,9 @@ metadata:
   name: {{ include "spard.fullname" . }}
   labels:
     {{- include "spard.labels" . | nindent 4 }}
+    {{- if .Values.service.labels -}}
+    {{- toYaml .Values.service.labels | nindent 4 }}
+    {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -13,5 +16,6 @@ spec:
       {{- if .Values.service.nodePort }}
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
+      name: http
   selector:
     {{- include "spard.selectorLabels" . | nindent 4 }}
