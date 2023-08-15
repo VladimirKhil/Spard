@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: vladimirkhil/spard
-  tag: "1.0.8"
+  tag: "1.0.9"
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -16,5 +16,11 @@ service:
   type: ClusterIP
   port: 80
   targetPort: 5000
+
+ingress:
+  enabled: false
+  clientSecret: ''
+  hosts: []
+  tls: []
 
 resources: {}
