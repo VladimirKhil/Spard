@@ -24,3 +24,6 @@ ingress:
   tls: []
 
 resources: {}
+
+options:
+  logLevel: Warning

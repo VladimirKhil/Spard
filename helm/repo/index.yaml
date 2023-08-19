@@ -2,8 +2,18 @@ apiVersion: v1
 entries:
   spard:
   - apiVersion: v2
+    appVersion: 1.0.5
+    created: "2023-08-19T08:58:17.8796128+02:00"
+    description: SPARD service app
+    digest: aa7f24b6e8b8a4d078ac6603681a85871964ad406ffde8f277b3e5ac7b7e194e
+    name: spard
+    type: application
+    urls:
+    - spard-1.0.5.tgz
+    version: 1.0.5
+  - apiVersion: v2
     appVersion: 1.0.4
-    created: "2023-08-15T09:40:53.3539171+02:00"
+    created: "2023-08-19T08:58:17.8796128+02:00"
     description: SPARD service app
     digest: ed630ca557ebb5c078df894738225dfeb3e8bcfee45db0b40f5e763d1207424a
     name: spard
@@ -13,7 +23,7 @@ entries:
     version: 1.0.4
   - apiVersion: v2
     appVersion: 1.0.3
-    created: "2023-08-15T09:40:53.3533862+02:00"
+    created: "2023-08-19T08:58:17.8716434+02:00"
     description: SPARD service app
     digest: 2a601f8ffb0fd2138b15f49013c062baa3b35d12c32ea1ed0706b6721b6760c0
     name: spard
@@ -23,7 +33,7 @@ entries:
     version: 1.0.3
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2023-08-15T09:40:53.352314+02:00"
+    created: "2023-08-19T08:58:17.8626121+02:00"
     description: SPARD service app
     digest: c4a063ac73b58fe7ac58794e9c6fe41826ad0b71fc4dd0250e8c2d5ddb35d4f0
     name: spard
@@ -33,7 +43,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 1.0.1
-    created: "2023-08-15T09:40:53.3518007+02:00"
+    created: "2023-08-19T08:58:17.8536403+02:00"
     description: SPARD service app
     digest: b795b0ca58023cb85faa1570a4156933f07040e5c63b67ed530c8b7c5d22aa27
     name: spard
@@ -43,7 +53,7 @@ entries:
     version: 1.0.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-08-15T09:40:53.3507688+02:00"
+    created: "2023-08-19T08:58:17.8456126+02:00"
     description: SPARD service app
     digest: 218f06eeb301525d9e9466cce7f3c2a5601abee688d14270632900d67bfa18bb
     name: spard
@@ -51,4 +61,4 @@ entries:
     urls:
     - spard-1.0.0.tgz
     version: 1.0.0
-generated: "2023-08-15T09:40:53.3486566+02:00"
+generated: "2023-08-19T08:58:17.8356398+02:00"

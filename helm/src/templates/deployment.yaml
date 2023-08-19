@@ -29,6 +29,9 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: Serilog__MinimumLevel
+              value: '{{ .Values.options.logLevel }}'
           volumeMounts:
           - name: log
             mountPath: /app/logs
