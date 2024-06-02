@@ -1,8 +1,9 @@
 ﻿using Spard.Service.Contract;
+using Spard.Service.Contracts;
 using Spard.Service.Helpers;
 using Spard.Service.Models;
 
-namespace Spard.Service.Implementation;
+namespace Spard.Service.Services;
 
 /// <inheritdoc />
 internal sealed class ExamplesRepository : IExamplesRepository

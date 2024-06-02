@@ -2,7 +2,7 @@ using NUnit.Framework;
 using Spard.Core;
 using Spard.Exceptions;
 
-namespace Spard.Test;
+namespace Spard.UnitTests;
 
 public sealed class TreeTransformerTests
 {

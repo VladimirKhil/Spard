@@ -1,4 +1,4 @@
-﻿namespace Spard.Test;
+﻿namespace Spard.UnitTests;
 
 public sealed class TestData : Tuple<string, string?>
 {

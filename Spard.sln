@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29920.165
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard", "src\Spard\Spard.csproj", "{E366C1B5-2FD1-46DD-B164-46C1F33DA308}"
 EndProject
@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Test", "test\Spard.Test\Spard.Test.csproj", "{2DFB6FF9-B352-48AB-A181-686084CBC6B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.UnitTests", "test\Spard.UnitTests\Spard.UnitTests.csproj", "{2DFB6FF9-B352-48AB-A181-686084CBC6B3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Service.Contract", "src\Spard.Service.Contract\Spard.Service.Contract.csproj", "{6AC6F33F-6C44-40E8-8C2A-A9E2EE406BF4}"
 EndProject
@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Service.Client", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Service", "src\Spard.Service\Spard.Service.csproj", "{0E8C0DFD-28BE-4A12-9F1D-6C3370C51C20}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Service.IntegrationTest", "test\Spard.Service.IntegrationTest\Spard.Service.IntegrationTest.csproj", "{639EA471-2EB8-484E-8D2D-7A042CC74191}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spard.Service.IntegrationTests", "test\Spard.Service.IntegrationTests\Spard.Service.IntegrationTests.csproj", "{639EA471-2EB8-484E-8D2D-7A042CC74191}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

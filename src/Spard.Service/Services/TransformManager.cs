@@ -3,11 +3,12 @@ using Spard.Core;
 using Spard.Exceptions;
 using Spard.Service.Configuration;
 using Spard.Service.Contract;
+using Spard.Service.Contracts;
 using Spard.Service.Metrics;
 using System.Diagnostics;
 using System.Text;
 
-namespace Spard.Service.Implementation;
+namespace Spard.Service.Services;
 
 /// <inheritdoc />
 internal sealed class TransformManager : ITransformManager

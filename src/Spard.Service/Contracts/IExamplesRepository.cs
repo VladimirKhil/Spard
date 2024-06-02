@@ -1,7 +1,8 @@
-﻿using Spard.Service.Helpers;
+﻿using Spard.Service.Contract;
+using Spard.Service.Helpers;
 using Spard.Service.Models;
 
-namespace Spard.Service.Contract;
+namespace Spard.Service.Contracts;
 
 /// <summary>
 /// Provides methods for working with SPARD examples.

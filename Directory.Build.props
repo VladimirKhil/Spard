@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Authors>Vladimir Khil</Authors>
     <Company>Khil-soft</Company>
-    <Copyright>Copyright © Khil-soft 2009 - 2023</Copyright>
+    <Copyright>Copyright © Khil-soft 2009 - 2024</Copyright>
     <PackageProjectUrl>https://github.com/VladimirKhil/Spard</PackageProjectUrl>
     <RepositoryUrl>https://github.com/VladimirKhil/Spard</RepositoryUrl>
   </PropertyGroup>

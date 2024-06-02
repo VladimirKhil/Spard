@@ -1,4 +1,4 @@
-﻿using Spard.Service.Contract;
+﻿using Spard.Service.Contracts;
 using Spard.Service.Models;
 using System.Text.Json;
 

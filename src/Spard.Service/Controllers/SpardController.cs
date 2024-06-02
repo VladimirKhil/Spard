@@ -1,68 +1,64 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Spard.Service.Contract;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using Spard.Service.Contracts;
 
-namespace Spard.Service.Controllers
+namespace Spard.Service.Controllers;
+
+/// <summary>
+/// Provides API for refactoring SPARD expressions.
+/// </summary>
+[ApiController]
+[Route("api/v1/spard")]
+public sealed class SpardController : ControllerBase
 {
+    private readonly ITransformManager _transformManager;
+
     /// <summary>
-    /// Provides API for refactoring SPARD expressions.
+    /// Initializes a new instance of <see cref="SpardController" /> class.
     /// </summary>
-    [ApiController]
-    [Route("api/v1/spard")]
-    public sealed class SpardController : ControllerBase
+    public SpardController(ITransformManager transformManager)
     {
-        private readonly ITransformManager _transformManager;
+        _transformManager = transformManager;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="SpardController" /> class.
-        /// </summary>
-        public SpardController(ITransformManager transformManager)
+    /// <summary>
+    /// Creates table transformation visualization.
+    /// </summary>
+    /// <param name="transform">SPARD transformation rules.</param>
+    /// <returns>Table with transformation rules.</returns>
+    // TODO: make this method return table model, not just a serialized string.
+    [HttpPost("table")]
+    public async Task<ActionResult<ProcessResult<string>>> GenerateTableAsync(
+        [FromBody] string transform,
+        CancellationToken cancellationToken = default)
+    {
+        try
         {
-            _transformManager = transformManager;
+            return await _transformManager.GenerateTableAsync(transform, cancellationToken);
         }
-
-        /// <summary>
-        /// Creates table transformation visualization.
-        /// </summary>
-        /// <param name="transform">SPARD transformation rules.</param>
-        /// <returns>Table with transformation rules.</returns>
-        // TODO: make this method return table model, not just a serialized string.
-        [HttpPost("table")]
-        public async Task<ActionResult<ProcessResult<string>>> GenerateTableAsync(
-            [FromBody] string transform,
-            CancellationToken cancellationToken = default)
+        catch (Exception exc)
         {
-            try
-            {
-                return await _transformManager.GenerateTableAsync(transform, cancellationToken);
-            }
-            catch (Exception exc)
-            {
-                return BadRequest(exc.Message);
-            }
+            return BadRequest(exc.Message);
         }
+    }
 
-        /// <summary>
-        /// Generates source code for SPARD rules.
-        /// </summary>
-        /// <param name="transform">SPARD transformation rules.</param>
-        /// <returns>C# source code for transformation rules.</returns>
-        [HttpPost("source")]
-        public async Task<ActionResult<ProcessResult<string>>> GenerateSourceCodeAsync(
-            [FromBody] string transform,
-            CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Generates source code for SPARD rules.
+    /// </summary>
+    /// <param name="transform">SPARD transformation rules.</param>
+    /// <returns>C# source code for transformation rules.</returns>
+    [HttpPost("source")]
+    public async Task<ActionResult<ProcessResult<string>>> GenerateSourceCodeAsync(
+        [FromBody] string transform,
+        CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                return await _transformManager.GenerateSourceCodeAsync(transform, cancellationToken);
-            }
-            catch (Exception exc)
-            {
-                return BadRequest(exc.Message);
-            }
+            return await _transformManager.GenerateSourceCodeAsync(transform, cancellationToken);
+        }
+        catch (Exception exc)
+        {
+            return BadRequest(exc.Message);
         }
     }
 }
