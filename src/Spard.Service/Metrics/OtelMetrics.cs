@@ -7,6 +7,8 @@ namespace Spard.Service.Metrics;
 /// </summary>
 public sealed class OtelMetrics
 {
+    public const string MeterName = "Spard";
+
     private Counter<int> TransformCounter { get; }
 
     private Counter<int> TransformTableCounter { get; }
@@ -15,12 +17,9 @@ public sealed class OtelMetrics
 
     private Counter<int> GenerateSourceCodeCounter { get; }
 
-    public string MeterName { get; }
-
-    public OtelMetrics(string meterName = "Spard")
+    public OtelMetrics(IMeterFactory meterFactory)
     {
-        var meter = new Meter(meterName);
-        MeterName = meterName;
+        var meter = meterFactory.Create(MeterName);
 
         TransformCounter = meter.CreateCounter<int>("transforms");
         TransformTableCounter = meter.CreateCounter<int>("table-transforms");

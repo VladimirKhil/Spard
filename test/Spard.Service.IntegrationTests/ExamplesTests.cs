@@ -11,13 +11,13 @@ public sealed class ExamplesTests : TestsBase
     public async Task GetExamples_OkAsync()
     {
         var examples = await SpardClient.Examples.GetExamplesAsync();
-        Assert.Greater(examples.Length, 0);
+        Assert.That(examples.Length, Is.GreaterThan(0));
 
         var firstExample = examples.OrderBy(e => e.Id).First();
         var example = await SpardClient.Examples.GetExampleAsync(firstExample.Id);
-        Assert.NotNull(example);
-        Assert.AreEqual(firstExample.Id, example.Id);
-        Assert.AreEqual(firstExample.Name, example.Name);
+        Assert.That(example, Is.Not.Null);
+        Assert.That(firstExample.Id, Is.EqualTo(example.Id));
+        Assert.That(firstExample.Name, Is.EqualTo(example.Name));
     }
 
     [Test]
@@ -32,9 +32,9 @@ public sealed class ExamplesTests : TestsBase
         var spardClientRus = ServiceCollectionExtensions.CreateSpardClient(options);
 
         var example = await spardClientRus.Examples.GetExampleAsync(5);
-        Assert.AreEqual("Двойная замена", example.Name);
+        Assert.That(example.Name, Is.EqualTo("Двойная замена"));
 
         var example2 = await SpardClient.Examples.GetExampleAsync(5);
-        Assert.AreEqual("Double replacement", example2.Name);
+        Assert.That(example2.Name, Is.EqualTo("Double replacement"));
     }
 }

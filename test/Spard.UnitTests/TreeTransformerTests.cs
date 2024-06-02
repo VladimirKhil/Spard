@@ -300,11 +300,11 @@ public sealed class TreeTransformerTests
             try
             {
                 var result = tree.TransformToText(pair.Item1);
-                Assert.AreEqual(pair.Item2, result);
+                Assert.That(pair.Item2, Is.EqualTo(result));
             }
             catch (TransformException)
             {
-                Assert.IsNull(pair.Item2);
+                Assert.That(pair.Item2, Is.Null);
             }
         }
     }

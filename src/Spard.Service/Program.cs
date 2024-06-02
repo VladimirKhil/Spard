@@ -4,15 +4,18 @@ using OpenTelemetry.Resources;
 using Serilog;
 using Spard.Service.BackgroundServices;
 using Spard.Service.Configuration;
+using Spard.Service.Contract;
 using Spard.Service.Contracts;
 using Spard.Service.EndpointDefinitions;
-using Spard.Service.Helpers;
 using Spard.Service.Metrics;
 using Spard.Service.Services;
+using System.Text.Json.Serialization;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Host.UseSerilog((ctx, lc) => lc
+    .WriteTo.Console(new Serilog.Formatting.Display.MessageTemplateTextFormatter(
+        "[{Timestamp:yyyy/MM/dd HH:mm:ss} {Level}] {Message:lj} {Exception}{NewLine}"))
     .ReadFrom.Configuration(ctx.Configuration)
     .Filter.ByExcluding(logEvent =>
         logEvent.Exception is BadHttpRequestException
@@ -38,7 +41,12 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
     services.AddHostedService<ExamplesLoader>();
 
     AddRateLimits(services, configuration);
-    AddMetrics(services);
+    AddMetrics(services, configuration);
+
+    services.ConfigureHttpJsonOptions(options =>
+    {
+        options.SerializerOptions.TypeInfoResolverChain.Insert(0, SpardSerializerContext.Default);
+    });
 }
 
 static void AddRateLimits(IServiceCollection services, IConfiguration configuration)
@@ -50,20 +58,26 @@ static void AddRateLimits(IServiceCollection services, IConfiguration configurat
     services.AddInMemoryRateLimiting();
 }
 
-static void AddMetrics(IServiceCollection services)
+static void AddMetrics(IServiceCollection services, IConfiguration configuration)
 {
-    var meters = new OtelMetrics();
+    services.AddSingleton<OtelMetrics>();
 
     services.AddOpenTelemetry().WithMetrics(builder =>
         builder
             .ConfigureResource(rb => rb.AddService("Spard"))
-            .AddMeter(meters.MeterName)
+            .AddMeter(OtelMetrics.MeterName)
             .AddAspNetCoreInstrumentation()
             .AddRuntimeInstrumentation()
             .AddProcessInstrumentation()
-            .AddPrometheusExporter());
+            .AddOtlpExporter(options =>
+            {
+                var otelUri = configuration["OpenTelemetry:ServiceUri"];
 
-    services.AddSingleton(meters);
+                if (otelUri != null)
+                {
+                    options.Endpoint = new Uri(otelUri);
+                }
+            }));
 }
 
 static void Configure(WebApplication app)
@@ -78,6 +92,11 @@ static void Configure(WebApplication app)
     TransformEndpointDefinitions.DefineExamplesEndpoint(app);
 
     app.UseIpRateLimiting();
-
-    app.UseOpenTelemetryPrometheusScrapingEndpoint();
 }
+
+[JsonSerializable(typeof(IEnumerable<SpardExampleBaseInfo>))]
+[JsonSerializable(typeof(SpardExampleInfo))]
+[JsonSerializable(typeof(TransformRequest))]
+[JsonSerializable(typeof(TransformTableResult))]
+[JsonSerializable(typeof(ProcessResult<string>))]
+internal partial class SpardSerializerContext : JsonSerializerContext { }

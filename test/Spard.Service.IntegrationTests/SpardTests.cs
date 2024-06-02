@@ -14,8 +14,8 @@ public sealed class SpardTests : TestsBase
 
         var actualResult = await SpardClient.Spard.GenerateTableAsync(transform);
 
-        Assert.AreEqual(result.Replace("\r", ""), actualResult.Result.Replace("\r", ""));
-        Assert.Greater(actualResult.Duration, TimeSpan.Zero);
+        Assert.That(result.Replace("\r", ""), Is.EqualTo(actualResult.Result.Replace("\r", "")));
+        Assert.That(actualResult.Duration, Is.GreaterThan(TimeSpan.Zero));
     }
 
     [Test]
@@ -26,7 +26,7 @@ public sealed class SpardTests : TestsBase
 
         var actualResult = await SpardClient.Spard.GenerateSourceCodeAsync(transform);
 
-        Assert.AreEqual(result.Replace("\r", ""), actualResult.Result.Replace("\r", ""));
-        Assert.Greater(actualResult.Duration, TimeSpan.Zero);
+        Assert.That(result.Replace("\r", ""), Is.EqualTo(actualResult.Result.Replace("\r", "")));
+        Assert.That(actualResult.Duration, Is.GreaterThan(TimeSpan.Zero));
     }
 }

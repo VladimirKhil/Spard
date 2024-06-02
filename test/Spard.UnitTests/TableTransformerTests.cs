@@ -140,7 +140,7 @@ public sealed class TableTransformerTests
             var res1 = transformer.TransformToText(test);
             sw1.Stop();
 
-            Assert.AreEqual(res1, res2);
+            Assert.That(res1, Is.EqualTo(res2));
 
             var sw3 = new Stopwatch();
 
@@ -150,7 +150,7 @@ public sealed class TableTransformerTests
                 var res3 = tableTransformer2.TransformToText(test);
                 sw3.Stop();
 
-                Assert.AreEqual(res1, res3);
+                Assert.That(res1, Is.EqualTo(res3));
             }
 
             var sw5 = new Stopwatch();
@@ -161,10 +161,10 @@ public sealed class TableTransformerTests
                 var res5 = new string(tt.ToArray());
                 sw5.Stop();
 
-                Assert.AreEqual(res1, res5);
+                Assert.That(res1, Is.EqualTo(res5));
             }
 
-            Assert.Pass("{0}: {1} {2} {3}", test, sw1.Elapsed, sw2.Elapsed, sw5.Elapsed);
+            Assert.Pass($"{test}: {sw1.Elapsed} {sw2.Elapsed} {sw5.Elapsed}");
         }
     }
 }

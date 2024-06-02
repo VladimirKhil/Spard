@@ -20,7 +20,7 @@ public sealed class TransformTests : TestsBase
         {
             if (!exampleResults.TryGetValue(example.Id, out var expectedResult))
             {
-                Assert.Fail("Unknown example: {0}", example.Id);
+                Assert.Fail($"Unknown example: {example.Id}");
             }
 
             var exampleData = await SpardClient.Examples.GetExampleAsync(example.Id);
@@ -31,8 +31,8 @@ public sealed class TransformTests : TestsBase
                 Transform = exampleData.Transform
             });
 
-            Assert.AreEqual(expectedResult.Replace("\r", ""), result.Result.Replace("\r", ""));
-            Assert.Greater(result.Duration, TimeSpan.Zero);
+            Assert.That(expectedResult.Replace("\r", ""), Is.EqualTo(result.Result.Replace("\r", "")));
+            Assert.That(result.Duration, Is.GreaterThan(TimeSpan.Zero));
         }
     }
 
@@ -49,11 +49,11 @@ public sealed class TransformTests : TestsBase
             Transform = transform
         });
 
-        Assert.AreEqual(result, actualResult.Result);
-        Assert.IsTrue(actualResult.IsStandardResultTheSame);
-        Assert.Greater(actualResult.ParseDuration, TimeSpan.Zero);
-        Assert.Greater(actualResult.StandardTransformDuration, TimeSpan.Zero);
-        Assert.Greater(actualResult.TableBuildDuration, TimeSpan.Zero);
-        Assert.Greater(actualResult.TableTransformDuration, TimeSpan.Zero);
+        Assert.That(result, Is.EqualTo(actualResult.Result));
+        Assert.That(actualResult.IsStandardResultTheSame, Is.True);
+        Assert.That(actualResult.ParseDuration, Is.GreaterThan(TimeSpan.Zero));
+        Assert.That(actualResult.StandardTransformDuration, Is.GreaterThan(TimeSpan.Zero));
+        Assert.That(actualResult.TableBuildDuration, Is.GreaterThan(TimeSpan.Zero));
+        Assert.That(actualResult.TableTransformDuration, Is.GreaterThan(TimeSpan.Zero));
     }
 }
