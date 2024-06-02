@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Spard.Service.IntegrationTests;
@@ -13,7 +13,7 @@ public sealed class TransformTests : TestsBase
     public async Task RunAllExamples_OkAsync()
     {
         var resultsText = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "exampleResults.json"));
-        var exampleResults = JsonConvert.DeserializeObject<Dictionary<int, string>>(resultsText);
+        var exampleResults = JsonSerializer.Deserialize<Dictionary<int, string>>(resultsText);
 
         var examples = await SpardClient.Examples.GetExamplesAsync();
         foreach (var example in examples)

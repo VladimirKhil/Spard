@@ -3,7 +3,9 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using Serilog;
 using Spard.Service.BackgroundServices;
+using Spard.Service.Configuration;
 using Spard.Service.Contracts;
+using Spard.Service.EndpointDefinitions;
 using Spard.Service.Helpers;
 using Spard.Service.Metrics;
 using Spard.Service.Services;
@@ -28,12 +30,10 @@ app.Run();
 
 static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
+    services.Configure<SpardOptions>(configuration.GetSection(SpardOptions.ConfigurationSectionName));
+
     services.AddSingleton<IExamplesRepository, ExamplesRepository>();
     services.AddSingleton<ITransformManager, TransformManager>();
-
-    services.AddControllers()
-        .AddJsonOptions(options =>
-            options.JsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter()));
 
     services.AddHostedService<ExamplesLoader>();
 
@@ -73,8 +73,9 @@ static void Configure(WebApplication app)
         app.UseDeveloperExceptionPage();
     }
 
-    app.UseRouting();
-    app.MapControllers();
+    ExamplesEndpointDefinitions.DefineExamplesEndpoint(app);
+    SpardEndpointDefinitions.DefineExamplesEndpoint(app);
+    TransformEndpointDefinitions.DefineExamplesEndpoint(app);
 
     app.UseIpRateLimiting();
 

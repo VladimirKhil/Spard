@@ -13,10 +13,10 @@ namespace Spard.Service.Services;
 /// <inheritdoc />
 internal sealed class TransformManager : ITransformManager
 {
-    private readonly SpardConfiguration _options;
+    private readonly SpardOptions _options;
     private readonly OtelMetrics _otelMetrics;
 
-    public TransformManager(IOptions<SpardConfiguration> options, OtelMetrics otelMetrics)
+    public TransformManager(IOptions<SpardOptions> options, OtelMetrics otelMetrics)
     {
         _options = options.Value;
         _otelMetrics = otelMetrics;
