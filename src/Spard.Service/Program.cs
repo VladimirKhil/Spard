@@ -69,15 +69,7 @@ static void AddMetrics(IServiceCollection services, IConfiguration configuration
             .AddAspNetCoreInstrumentation()
             .AddRuntimeInstrumentation()
             .AddProcessInstrumentation()
-            .AddOtlpExporter(options =>
-            {
-                var otelUri = configuration["OpenTelemetry:ServiceUri"];
-
-                if (otelUri != null)
-                {
-                    options.Endpoint = new Uri(otelUri);
-                }
-            }));
+            .AddOtlpExporter());
 }
 
 static void Configure(WebApplication app)
