@@ -27,3 +27,7 @@ resources: {}
 
 options:
   logLevel: Warning
+  otel:
+    uri: 'http://localhost:4317'
+    metric:
+      exportInterval: 60000

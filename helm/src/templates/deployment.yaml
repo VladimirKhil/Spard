@@ -30,6 +30,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: '{{ .Values.options.otel.uri }}'
+            - name: OTEL_METRIC_EXPORT_INTERVAL
+              value: '{{ .Values.options.otel.metric.exportInterval }}'
             - name: Serilog__MinimumLevel
               value: '{{ .Values.options.logLevel }}'
           volumeMounts:
