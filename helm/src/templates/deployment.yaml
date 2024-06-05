@@ -14,15 +14,6 @@ spec:
       labels:
         {{- include "spard.selectorLabels" . | nindent 8 }}
     spec:
-      volumes:
-        - name: log
-          {{- if .Values.logPath }}
-          hostPath:
-            path: '{{- toYaml .Values.logPath }}'
-            type: Directory
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -36,8 +27,5 @@ spec:
               value: '{{ .Values.options.otel.metric.exportInterval }}'
             - name: Serilog__MinimumLevel
               value: '{{ .Values.options.logLevel }}'
-          volumeMounts:
-          - name: log
-            mountPath: /app/logs
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

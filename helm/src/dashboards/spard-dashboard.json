@@ -110,7 +110,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(transforms[$__rate_interval])",
+          "expr": "rate(transforms_total[$__rate_interval])",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
@@ -202,7 +202,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(table_transforms[$__rate_interval])",
+          "expr": "rate(table_transforms_total[$__rate_interval])",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
@@ -294,7 +294,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(tables_generated[$__rate_interval])",
+          "expr": "rate(tables_generated_total[$__rate_interval])",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
@@ -386,7 +386,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(sources_generated[$__rate_interval])",
+          "expr": "rate(sources_generated_total[$__rate_interval])",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
